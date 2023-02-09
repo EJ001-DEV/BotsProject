@@ -1,21 +1,36 @@
-# import the time module
-import time
-  
-# define the countdown func.
-def countdown(t):
-    
-    while t:
-        mins, secs = divmod(t, 60)
-        timer = '{:02d}:{:02d}'.format(mins, secs)
-        print(timer, end="\r")
-        time.sleep(1)
-        t += 1
-      
-    print('Fire in the hole!!')
-  
-  
-# input time in seconds
-t = input("Enter the time in seconds: ")
-  
-# function call
-countdown(int(t))
+
+
+from enum import Enum
+
+
+class TimerStatus(Enum):
+    INITIALIZED = 1
+    RUNNING = 2
+    STOPPED = 3
+    EXPIRED = 4
+
+
+class Timer:
+
+    def __init__(self):
+        self.status = TimerStatus.INITIALIZED
+        self.ticks = 0
+
+    def get_status(self):
+        return self.status
+
+    def start(self, max_ticks):
+        self.max_ticks = max_ticks
+        self.status = TimerStatus.RUNNING
+        self.ticks = 0
+
+    def stop(self):
+        self.status = TimerStatus.STOPPED
+
+    def get_ticks(self):
+        return self.ticks
+
+    def tick(self):
+        self.ticks += 1
+        if self.get_ticks() >= self.max_ticks:
+            self.status = TimerStatus.EXPIRED

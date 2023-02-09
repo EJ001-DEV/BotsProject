@@ -107,6 +107,7 @@ async def RuleLoop(ctx, nTime : int, sProcedure : str):
 
     #Stop the timer when reached the limit of time.
     if nTime == nTimerLimit:
+        await ctx.send('**TIME: ' + str(Seconds_to_TimeFormat(nTime)) + '**')
         slow_count.stop()
 
 @tasks.loop(seconds=1.0)
