@@ -4,7 +4,7 @@ from discord.ext import tasks, commands
 #from urllib import parse, request
 #import re
 #import datetime
-#import time
+import time
 
 
 intents = discord.Intents.all()
@@ -118,7 +118,7 @@ async def slow_count(ctx, sProcedure):
     await RuleLoop(ctx, slow_count.current_loop, sProcedure)
 
 @slow_count.before_loop
-async def before_printer():    
+async def before_printer():
     print('waiting...')
 
 @slow_count.after_loop
