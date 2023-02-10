@@ -1,7 +1,7 @@
 import asyncio
 import discord
 import sqlite3
-#import os
+import os
 from datetime import datetime
 from timer import Timer, TimerStatus
 from discord.ext import commands
@@ -14,6 +14,7 @@ COLOR_SUCCESS = 0x33c633
 
 
 
+
 class DiscordCog(commands.Cog):
 
 
@@ -22,13 +23,14 @@ class DiscordCog(commands.Cog):
         self.timer = Timer()
         self.db = sqlite3.connect('db_TQG.db')
         self.create_tables()
+        print('init')
 
 
     def create_tables(self):
         cur = self.db.cursor()
         # Create table
         cur.execute('''
-        CREATE TABLE IF NOT EXISTS helper (
+        CREATE TABLE IF NOT EXISTS alarms (
             id integer PRIMARY KEY AUTOINCREMENT,
             username text NOT NULL,
             start_time text NOT NULL,
@@ -38,10 +40,24 @@ class DiscordCog(commands.Cog):
         self.db.commit()
 
 
+    @commands.command
+    def init_bot(self):
+        intents = discord.Intents.all()
+        intents.message_content = True
+
+        self.bot = commands.Bot(command_prefix='!', description="This is a helper bot",intents= intents)
+
+               
+
+
     @commands.Cog.listener()
     async def on_ready(self):
+        print('on_ready')
         print('We have logged in as {}'.format(self.bot.user))
 
+    @commands.command()
+    async def table(self):
+        await self.create_tables()
 
     @commands.command()
     async def start(self, ctx):
@@ -53,13 +69,13 @@ class DiscordCog(commands.Cog):
         current_time = now.strftime("%H:%M:%S")
         cur = self.db.cursor()
         cur.execute('''
-        INSERT INTO helper (username, start_time, delay)
+        INSERT INTO alarms (username, start_time, delay)
             VALUES (?,?,?)
         ''', [str(ctx.author),current_time,'10'])
         self.db.commit()
 
         cur = self.db.cursor()
-        for row in cur.execute('SELECT * FROM helper'):
+        for row in cur.execute('SELECT * FROM alarms'):
             print(row)
 
         await self.show_message(ctx, "Time to start working!", COLOR_SUCCESS)
@@ -75,7 +91,6 @@ class DiscordCog(commands.Cog):
                 self.timer.tick()
             if self.timer.get_status() == TimerStatus.EXPIRED:
                 await self.show_message(ctx, "Okay, break over!", COLOR_SUCCESS)
-
 
     async def show_message(self, ctx, title, color):
         start_work_em = discord.Embed(title=title, color=color)
@@ -106,5 +121,13 @@ class DiscordCog(commands.Cog):
         show_help_em = discord.Embed(title="This is Mr Pomo Dorio, a friendly Pomodoro bot", description=description,
                                     color=COLOR_SUCCESS)
         await ctx.send(embed=show_help_em)
+    
 
+    load_dotenv()
+    
+#DiscordCog.create_tables(self=)
+    
+#DiscordCog.init_bot()
+    #print('BOT_TOKEN:  {}'.format(env['BOT_TOKEN']))
+    #run(format(env['BOT_TOKEN'])) 
     
