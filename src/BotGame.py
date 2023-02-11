@@ -21,32 +21,37 @@ class OperDiscord(commands.Cog):
 
     @commands.Cog.listener()
     #@commands.Bot.event(commands.Bot)
+    #@commands.Bot.event
     async def on_ready(self):
         print('on_ready')
         print('We have logged in as {}'.format(self.bot.user))
         await self.bot.change_presence(activity=discord.Streaming(name="Three Questions' Game",url=""))
-    '''
-    #@commands.Bot.event
-    @commands.Bot.event
-    async def on_ready(self):
-        await self.bot.change_presence(activity=discord.Streaming(name="Three Questions' Game",url=""))
-        print("My Bot is ready")
-    '''
+    
+    #member:discord.Member
+    #@commands.command(pass_context=True)
+    @commands.Cog.listener()
+    #@commands.Bot.command()
+    async def startgame(self, ctx):
+        #member = ctx.author
+        print('start game')
+        print('guild: ' + str(ctx.guild.id) + ' author: ', ctx.author)
 
+
+foo = OperDiscord(commands.Cog)
+
+
+@foo.bot.command()
+async def OperGame(ctx):
+    #member = ctx.author
+    await foo.startgame(ctx)
+'''
 oData = OperationDB('SEL', 'VOICE_CHANNEL', ['IDCHANNEL','CHANNELNAME'], None, "IDCHANNEL = '1071493291876552872'")
 
 for i in oData:
     print(i)
 oData.close()
+'''
 
-foo = OperDiscord(commands.Cog)
 foo.bot.run(format(env['BOT_TOKEN']))
 
 #oOperDB.ProcSelect('channel2', ['id','username','delay'], "username = 'EJ001'")
-
-
-
-
-
-        
-    

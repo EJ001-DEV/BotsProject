@@ -20,7 +20,6 @@ load_dotenv()
 
 class DiscordDB():
 
-
     def __init__(self):
         #self.bot = bot
         #self.timer = Timer()
