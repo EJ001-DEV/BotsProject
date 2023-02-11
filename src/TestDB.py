@@ -1,13 +1,11 @@
 import asyncio
 import discord
 import sqlite3
-#import os
+import os
 from datetime import datetime
 from timer import Timer, TimerStatus
-from discord.ext import commands
-
-from os import environ as env
 from dotenv import load_dotenv
+from discord.ext import commands
 
 COLOR_DANGER = 0xc63333
 COLOR_SUCCESS = 0x33c633
@@ -20,7 +18,7 @@ class DiscordCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.timer = Timer()
-        self.db = sqlite3.connect('db_TQG.db')
+        self.db = sqlite3.connect('main.db')
         self.create_tables()
 
 
@@ -28,7 +26,7 @@ class DiscordCog(commands.Cog):
         cur = self.db.cursor()
         # Create table
         cur.execute('''
-        CREATE TABLE IF NOT EXISTS helper (
+        CREATE TABLE IF NOT EXISTS alarms (
             id integer PRIMARY KEY AUTOINCREMENT,
             username text NOT NULL,
             start_time text NOT NULL,
@@ -53,13 +51,13 @@ class DiscordCog(commands.Cog):
         current_time = now.strftime("%H:%M:%S")
         cur = self.db.cursor()
         cur.execute('''
-        INSERT INTO helper (username, start_time, delay)
+        INSERT INTO alarms (username, start_time, delay)
             VALUES (?,?,?)
         ''', [str(ctx.author),current_time,'10'])
         self.db.commit()
 
         cur = self.db.cursor()
-        for row in cur.execute('SELECT * FROM helper'):
+        for row in cur.execute('SELECT * FROM alarms'):
             print(row)
 
         await self.show_message(ctx, "Time to start working!", COLOR_SUCCESS)
@@ -107,4 +105,33 @@ class DiscordCog(commands.Cog):
                                     color=COLOR_SUCCESS)
         await ctx.send(embed=show_help_em)
 
-    
+#DiscordCog.create_tables()
+load_dotenv()
+
+def setup(bot):
+    bot.add_cog(DiscordCog(bot))
+    print("Scrims cog is loaded!")
+
+'''
+async def main():
+    """
+    Create the tables and columns if they don't already exist,
+     If using sqlite, it'll create the .db file as well
+    """
+    async with engine.begin() as conn:
+            # drop all tables, if any exists  
+            # await conn.run_sync(Base.metadata.drop_all)
+            # actually create any non existing tables and columns inside the database
+        await conn.run_sync(Base.metadata.create_all)
+
+        # close and clear open connection pools
+        await engine.dispose()
+
+
+
+if __name__ == "__main__":
+    # use asyncio to run the create_tables function
+    import asyncio
+
+    asyncio.run(main())
+'''

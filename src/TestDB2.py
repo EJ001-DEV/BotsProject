@@ -7,13 +7,11 @@ from timer import Timer, TimerStatus
 from discord.ext import commands
 
 from os import environ as env
+
 from dotenv import load_dotenv
 
 COLOR_DANGER = 0xc63333
 COLOR_SUCCESS = 0x33c633
-
-
-
 
 class DiscordCog(commands.Cog):
 
@@ -27,6 +25,7 @@ class DiscordCog(commands.Cog):
 
 
     def create_tables(self):
+        print('create table')
         cur = self.db.cursor()
         # Create table
         cur.execute('''
@@ -123,7 +122,12 @@ class DiscordCog(commands.Cog):
         await ctx.send(embed=show_help_em)
     
 
-    load_dotenv()
+load_dotenv()
+
+oOper = DiscordCog(commands)
+
+#with DiscordCog() as db:
+#    db.create_tables()
     
 #DiscordCog.create_tables(self=)
     
