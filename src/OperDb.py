@@ -64,16 +64,21 @@ class DiscordDB():
         cField = self.SplitStr(field)
         
         if cWhere is not None:
-            cSQL = 'Select ' + cField + ' from ' + cTable + ' ' + cWhere
+            cSQL = 'Select ' + cField + ' from ' + cTable + ' Where ' + cWhere
         else:
             cSQL = 'Select ' + cField + ' from ' + cTable
         
         print(cSQL)
+        #oData = []
         self.db = sqlite3.connect(format(env['DBName']))
         cur = self.db.cursor()        
-        for row in cur.execute(cSQL):
-            print(row[0] , row[1], row[2])
-        self.db.close()
+        row = cur.execute(cSQL)
+        #oData = row
+        #for row in cur.execute(cSQL):
+        #    #print(row[0] , row[1], row[2])        
+        #    print(row)
+        #self.db.close()
+        return row
 
     def ProcInsert(self, cTable : str, field, ValueInsert):
         #Split fields of select
@@ -103,14 +108,27 @@ class DiscordDB():
         self.db.close()
         print('Update Done')        
         
-
-
+def OperationDB(cOper : str, cTable : str, oField, oValue, cWhere : str):
+    #construct the object
+    oOperDB = DiscordDB()
+    oData = None
+    if cOper == 'SEL':#Select Table
+        #oData = None
+        oData = oOperDB.ProcSelect(cTable, oField, cWhere)        
+        #oOperDB.ProcSelect(cTable: str, field: Any, cWhere: str)
+    elif cOper == 'UPD':#Update Table
+        oOperDB.ProcUpdate(cTable, oField, cWhere)
+        #oOperDB.ProcUpdate(cTable: str, cField_cValue: Any, cWhere: str)
+    elif cOper == 'INS':#Insert Table
+        oOperDB.ProcInsert(cTable, oField, oValue)
+        #oOperDB.ProcInsert(cTable: str, field: Any, ValueInsert: Any)
+    return oData
 #print('SQLDB:  {}'.format(env['SQLDB']))
 #bot.run(format(env['BOT_TOKEN']))
 
-oOperDB = DiscordDB()
+
 ##SQL SELECT
-oOperDB.ProcSelect('channel2', ['id','username','delay'], "Where username = 'EJ001'")
+#oOperDB.ProcSelect('channel2', ['id','username','delay'], "Where username = 'EJ001'")
 #oOperDB.ProcSelect('channel', ['id','username','delay'], 'Where  CAST(delay as integer) < 7')
 #oOperDB.ProcSelect('channel2', ['id','username','delay'], 'Where  CAST(delay as integer) = 5 ')
 
@@ -124,6 +142,6 @@ oOperDB.ProcSelect('channel2', ['id','username','delay'], "Where username = 'EJ0
 ##STATUS GAME: START GAME (STA), END GAME (END)
 #oOperDB.ProcUpdate("GAME", "STATUS = 'STA'","IDGAME = 1")
 
-oOperDB.ProcUpdate("GAME", "STATUS = 'END', DATEENDGAME = '2023-02-11 16:34:52'","IDGAME = 1")
+#oOperDB.ProcUpdate("GAME", "STATUS = 'END', DATEENDGAME = '2023-02-11 16:34:52'","IDGAME = 1")
 
 print('Job Finish')

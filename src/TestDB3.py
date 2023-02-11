@@ -99,5 +99,5 @@ if __name__ == "setup1":
 
     asyncio.run(setup())
 
-foo = ScrimsCog(ctx, commands,'')
-foo.on_message()
+#foo = ScrimsCog(ctx, commands,'')
+#foo.on_message()
