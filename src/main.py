@@ -45,7 +45,7 @@ async def post_info(ctx):
 @bot.command()
 async def allmembers(ctx):
     channel = bot.get_channel(1071493291876552872) #gets the channel you want to get the list from
-
+        
     members = channel.members #finds members connected to the channel
 
     memids = [] #(list)
