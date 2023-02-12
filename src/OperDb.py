@@ -24,7 +24,7 @@ class DiscordDB():
         #self.bot = bot
         #self.timer = Timer()
         #self.db = sqlite3.connect(format(env['DBName']))
-        self.create_tables()
+        #self.create_tables()
         print('init')
 
 
@@ -72,11 +72,13 @@ class DiscordDB():
         self.db = sqlite3.connect(format(env['DBName']))
         cur = self.db.cursor()        
         row = cur.execute(cSQL)
+        
+        #print('total rows: ' + str(len(row)))
         #oData = row
         #for row in cur.execute(cSQL):
         #    #print(row[0] , row[1], row[2])        
         #    print(row)
-        #self.db.close()
+        
         return row
 
     def ProcInsert(self, cTable : str, field, ValueInsert):
