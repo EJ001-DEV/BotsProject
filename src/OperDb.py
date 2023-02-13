@@ -115,7 +115,7 @@ def OperationDB(cOper : str, cTable : str, oField, oValue, cWhere : str):
     oData = None
     if cOper == 'SEL':#Select Table
         #oData = None
-        oData = oOperDB.ProcSelect(cTable, oField, cWhere)        
+        oData = oOperDB.ProcSelect(cTable, oField, cWhere)                
         #oOperDB.ProcSelect(cTable: str, field: Any, cWhere: str)
     elif cOper == 'UPD':#Update Table
         oOperDB.ProcUpdate(cTable, oField, cWhere)
