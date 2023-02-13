@@ -72,10 +72,13 @@ class OperDiscord(commands.Cog):
         
         for OneRow in oData:            
             nIdGame = OneRow[0]#IdGame
-        return nIdGame
+        return [nIdGame, oData]
 
     def Get_MemberId(self, cMemberId: str):
-        nIdGame = self.Get_Game_OK()#find a active game
+        oSelect = self.Get_Game_OK()#find a active game
+        nIdGame = oSelect[0]
+        oConection = oSelect[1]
+        oConection.close()
 
         oData = OperationDB('SEL', 'DISCORD_USER', ['IDMEMBER'], None, "IDMEMBER = '" + cMemberId + "' and IDGAME = " + str(nIdGame))
         
@@ -130,6 +133,7 @@ class OperDiscord(commands.Cog):
 
         print(channel)
         print(members)
+        print('all members')
 
         oData = OperationDB('SEL', 'GAME', ['IDGAME'], None, "STATUS = 'OK' and IDCHANNEL = '" + str(cIdChannel) + "'")        
         
@@ -188,11 +192,20 @@ async def on_voice_state_update(member:discord.Member, before, after):
 
         print('Member id: ' + str(cMemberId))
 
-        nIdGame = foo.Get_Game_OK()#find a active game
+        oSelect = []
+        oSelect = foo.Get_Game_OK()#find a active game
+        
+        nIdGame = oSelect[0]
+        oConection = oSelect[1]
+        
+        print('event before oConection.rowcount: ' + str(oConection.rowcount))
 
-        #update the state's user in the table DISCORD_USER to OUT
-        OperationDB('UPD', 'DISCORD_USER', "STATUS = 'OUT'", None, "IDMEMBER = '" + str(cMemberId) + "' and IDGAME = " + str(nIdGame))             
-
+        if oConection.rowcount > 0:
+            #update the state's user in the table DISCORD_USER to OUT
+            OperationDB('UPD', 'DISCORD_USER', "STATUS = 'OUT'", None, "IDMEMBER = '" + str(cMemberId) + "' and IDGAME = " + str(nIdGame))             
+        
+        oConection.close()
+       
         return
 
     else:
@@ -210,13 +223,18 @@ async def on_voice_state_update(member:discord.Member, before, after):
                     #await VC.connect()
                     print(f'{member} Joined Channel')
 
-                    nIdGame = foo.Get_Game_OK()#find a active game
+                    oSelect = []
+                    oSelect = foo.Get_Game_OK()#find a active game
+                    nIdGame = oSelect[0]
+                    oConection = oSelect[1]
+
+                    oConection.close()
 
                     oData = OperationDB('SEL', 'DISCORD_USER', ['IDMEMBER'], None, "IDMEMBER = '" + str(memids[0]) + "' and IDGAME = " + str(nIdGame))
                     
                     for OneRow in oData:            
                         nIdMember = OneRow[0]#IdGame
-                    #print('member id from select: ' + str(oData.rowcount))
+                    print('member id from select: ' + str(oData.rowcount))
                     
                     if oData.rowcount > 0:
                         #update the state's user in the table DISCORD_USER to OK
@@ -224,7 +242,8 @@ async def on_voice_state_update(member:discord.Member, before, after):
                         print('Member in DISCORD_USER: ' + nIdMember)
                     elif oData.rowcount < 0:
                         None#create a user
-                        
+                        print('run_allmembers')
+                        #await run_allmembers(bot.get_context(bot))
                         #await foo.allmembers(ctx)
                         #run_allmembers(ctx)
 
@@ -270,9 +289,12 @@ async def OperGame(ctx):
     #await setup(bot)#register the Cog and Events to work
     await foo.startgame(ctx)
 
-#@bot.command()
 @bot.command()
 async def run_allmembers(ctx):
+    print('dentro run_allmembers')
+    await run_allmembers2(ctx)
+
+async def run_allmembers2(ctx):
     await foo.allmembers(ctx)#member=discord.member
 
 
