@@ -2,16 +2,11 @@ import discord
 import asyncio
 from discord.ext import tasks, commands
 from OperDb import OperationDB
-#from urllib import parse, request
-#import re
-#import datetime
-#import time
-
 
 intents = discord.Intents.all()
 intents.message_content = True
 
-bot = commands.Bot(command_prefix='>', description="This is a helper bot",intents= intents)
+bot = commands.Bot(command_prefix='!', description="This is a helper bot",intents= intents)
 
 
 
@@ -149,24 +144,27 @@ async def after_slow_count():
     print('done!')
 
 @bot.command(pass_context=True)
-async def start(ctx, sProcedure : str, sUser : str):    
+async def starttimer(ctx, sProcedure : str, sUser : str):    
     await RuleTime(ctx, sProcedure, sUser)
     await slow_count.start(ctx, sProcedure)
     
 
 @bot.command(pass_context=True)
-async def stop(ctx):    
+async def stoptimer(ctx) -> int:
     slow_count.stop()
+    LastTime = slow_count.current_loop
     await LastMessage(ctx, slow_count.current_loop)
+    return LastTime
 
 #Events
+'''
 @bot.event
 async def on_ready():
     await bot.change_presence(activity=discord.Streaming(name="Three Questions' Game",url=""))
     print("My Bot is ready")
-
+'''
 #Test Token
 #bot.run('MTA3MTU2MzkxMzI0MzY2ODU3MA.Ge86lU.s-w4u3QHqcIRWXAnoQSh3OTkukTJghlPHhtDc8')
 
 #Production Token
-bot.run('MTA3MTQ1MTY4NDY5MTI2MzUzOA.G9psxv.e4Txs3Q_cY7atTLTzANhkJLRn_2957vG6ZFoxc')
+#bot.run('MTA3MTQ1MTY4NDY5MTI2MzUzOA.G9psxv.e4Txs3Q_cY7atTLTzANhkJLRn_2957vG6ZFoxc')
