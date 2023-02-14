@@ -57,15 +57,22 @@ class DiscordDB():
             cField = cField + cText[i] + cSeparator        
         return cField
 
-    def ProcSelect(self, cTable : str, field, cWhere : str):
+    def ProcSelect(self, cTable : str, field, cWhere : str, cOptionalSQL: str):
         
         #Split fields of select
         cField = self.SplitStr(field)
+        cSQL = ''
         
-        if cWhere is not None:
-            cSQL = 'Select ' + cField + ' from ' + cTable + ' Where ' + cWhere
-        else:
+        if cWhere is None and cOptionalSQL is None:
             cSQL = 'Select ' + cField + ' from ' + cTable
+        
+        if cWhere is not None and cOptionalSQL is None:
+            cSQL += 'Select ' + cField + ' from ' + cTable + ' Where ' + cWhere
+        
+        if cWhere is not None and cOptionalSQL is not None:
+            cSQL += 'Select ' + cField + ' from ' + cTable + ' Where ' + cWhere + cOptionalSQL
+        
+        
         
         print(cSQL)
         #oData = []
@@ -109,13 +116,13 @@ class DiscordDB():
         self.db.close()
         print('Update Done')        
         
-def OperationDB(cOper : str, cTable : str, oField, oValue, cWhere : str):
+def OperationDB(cOper : str, cTable : str, oField, oValue, cWhere : str, cOptionalSQL: str):
     #construct the object
     oOperDB = DiscordDB()
     oData = None
     if cOper == 'SEL':#Select Table
         #oData = None
-        oData = oOperDB.ProcSelect(cTable, oField, cWhere)                
+        oData = oOperDB.ProcSelect(cTable, oField, cWhere, cOptionalSQL)                
         #oOperDB.ProcSelect(cTable: str, field: Any, cWhere: str)
     elif cOper == 'UPD':#Update Table
         oOperDB.ProcUpdate(cTable, oField, cWhere)

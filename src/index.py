@@ -7,6 +7,14 @@ import asyncio
 from urllib import parse, request
 import re
 
+#################################
+#Both library to gets values from .env file
+from dotenv import load_dotenv
+from os import environ as env
+#################################
+
+load_dotenv()
+
 intents = discord.Intents.all()
 intents.message_content = True
 
@@ -177,4 +185,4 @@ async def on_reaction_add():
           
 
 
-bot.run('MTA3MTU2MzkxMzI0MzY2ODU3MA.GusjIc.fdkFIKKS9A-TbAuyfHKtGKbhUp8xC6pUzoFXHA')
+bot.run(format(env['BOT_TOKEN']))#Start the Bot
