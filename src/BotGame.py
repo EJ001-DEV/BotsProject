@@ -445,6 +445,15 @@ async def on_ready():
 @bot.event
 async def on_voice_state_update(member:discord.Member, before, after): 
     #Global: cMemberId
+
+    bStatus = False
+    
+    bStatus = foo.Get_GameStatus()
+    #print('bStatus: ' + str(bStatus))
+    if bStatus == False:#find a active game
+        return
+
+
     cMemberId = member.id
 
     if member == bot.user:  #CATCH
