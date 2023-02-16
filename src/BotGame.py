@@ -1,11 +1,11 @@
 import discord
 from discord.ext import commands
 import datetime
-import time
+#import time
 from datetime import datetime
-from timer import Timer, TimerStatus
+#from timer import Timer, TimerStatus
 
-from urllib import parse, request
+#from urllib import parse, request
 
 
 #################################
@@ -16,7 +16,7 @@ from os import environ as env
 
 from OperDb import OperationDB
 from TimeKeeper import starttimer, stoptimer
-import os
+#import os
 
 load_dotenv()
 
@@ -60,6 +60,11 @@ class OperDiscord(commands.Cog):
             Self.IdMember = IdMember
             Self.UserDesc = UserDesc
             Self.nPointTotal = nPointTotal
+
+    class UserRoleDetail():
+        def __init__(Self, RoleId, BotCommand):
+            Self.RoleId = RoleId
+            Self.BotCommand = BotCommand
 
     def __init__(Self, bot):
         Self.bot = bot  
@@ -161,6 +166,119 @@ class OperDiscord(commands.Cog):
         oData.close()
         return [oData, nIdMember, cUserDesc]
 
+    def ValidateRoleCommand(Self, cCommand: str, cRoleCode: str):
+        cStatus = ''
+        
+        oData = OperationDB('SEL', 'BOT_ROLE', ["'Y' VALIDATE"], None, "ROLEID = (SELECT ROLEID FROM HELPER_ROLE WHERE HELPERCODE = '" + cRoleCode + "') AND BOT_COMMAND = '"+ cCommand +"'", None)        
+        
+        for OneRow in oData:            
+            cStatus = str(OneRow[0])#Validate
+        
+        print('status: ' + cStatus)
+
+        oData.close()
+        if cStatus == 'Y':
+            return True
+        elif len(cStatus) <= 0:
+            return False
+                           
+
+    async def GRoleUser(Self, ctx, cIdMember: str, cRoleCode: str):    
+        print('application_id: ' + str(bot.application_id))
+        MyRoleCommand = []
+    
+        oConection = None
+        oSelect = []
+        oSelect = Self.Get_Game_OK()#find a active game
+        oConection = oSelect[0]
+        nIdGame = oSelect[1]
+        oConection.close() 
+      
+        
+        #nIdGame = 13
+        #bValidate = foo.Validate_User(cIdMember, nIdGame)#Validate if the user is into the game
+
+        #if bValidate == False:
+        #    await ctx.send("User is not in the game, check out!")
+        #    return
+      
+        #cRoleCodeUp = cRoleCode.upper()
+        
+        #oData = None
+        oSelect = []
+
+        #oData = Self.GetRoleCode(bot.application_id, cRoleCodeUp)#Look up the Role Id permition
+
+        oData = None
+
+        oData = OperationDB('SEL', 'BOT_ROLE', ['ROLEID', 'BOT_COMMAND'], None, "ROLEID = (SELECT ROLEID FROM HELPER_ROLE WHERE HELPERCODE = '"+ 'TK' +"') AND APLICATIONID = '"+ str(bot.application_id) +"'", None)        
+        
+        dblista = []
+
+        for OneRow in oData:
+            #print(OneRow)
+            #dblista = [OneRow[0],OneRow[1]]
+            dblista.append(list(OneRow))
+        
+        #print(dblista)
+
+        #print(dblista[0][0], dblista[0][1])
+
+
+        oData.close()
+        
+        cAplicationId = bot.application_id
+
+        for i in range(len(dblista)):
+            print(dblista[i][0], dblista[i][1])#1st [] -> row / 2nd [] -> column
+            nIdRole = dblista[i][0]
+            nBotCommand = dblista[i][1]
+            #Insert a row of a permit-role for a user selected to use a command
+            OperationDB('INS', 'ROLE_USERID', ['ROLEID','APLICATIONID','BOT_COMMAND','IDGAME','IDMEMBER','STATUS'],[str(nIdRole), "'"+ str(cAplicationId) + "'", "'"+ str(nBotCommand) + "'", str(nIdGame), "'"+ cIdMember + "'", "'OK'"], None, None)            
+
+            #cIdMember
+
+            #Insert a row of a permit-role for a user selected to use a command
+            #OperationDB('INS', 'ROLE_USERID', ['ROLEID','APLICATIONID','BOT_COMMAND','IDGAME','IDMEMBER','STATUS'],[str(nIdRole), "'"+ str(cAplicationId) + "'", "'"+ str(nBotCommand) + "'", str(nIdGame), "'"+ '0947489734785' + "'", "'OK'"], None, None)  
+
+            #Insert a row of a permit-role for a user selected to use a command
+            #OperationDB('INS', 'ROLE_USERID', ['APLICATIONID'],[str('79873454353489')], None, None)                    
+
+        #oConection = oSelect[0]
+        #nIdRole = oSelect[1]
+        #nBotCommand = oSelect[2]
+        
+        
+        #oConection = oSelect[0]
+        #nIdRole = oSelect[1]
+        #nIdRole = ''
+        #nBotCommand = ''
+        cAplicationId = bot.application_id
+        '''
+        for OneRow in MyRoleCommand:
+        #for i in range(len(dblista)):
+            #print(OneRow)
+            nIdRole = OneRow.RoleId
+            nBotCommand = OneRow.BotCommand
+            '''
+        for i in range(len(MyRoleCommand)):
+        #for i in range(len(dblista)):
+            #print(OneRow)
+            nIdRole = MyRoleCommand[i].RoleId
+            nBotCommand = MyRoleCommand[i].BotCommand            
+            #nIdRole = OneRow[0]
+            #nBotCommand = OneRow[1]
+            print('nIdRole: ' + str(nIdRole) + ' nBotCommand: ' + str(nBotCommand))
+            #Insert a row of a permit-role for a user selected to use a command
+            #OperationDB('INS', 'ROLE_USERID', ['ROLEID','APLICATIONID','BOT_COMMAND','IDGAME','IDMEMBER','STATUS'],[str(nIdRole), "'"+ str(cAplicationId) + "'", "'"+ str(nBotCommand) + "'", str(nIdGame), "'"+ cIdMember + "'", "'OK'"], None, None)
+            
+            #Insert into ROLE_USERID(ROLEID,APLICATIONID,BOT_COMMAND,IDGAME,IDMEMBER,STATUS) values (2,'1071451684691263538','start',13,'705234368758808660','OK')
+
+            #OperationDB('INS', 'DISCORD_USER', ['IDMEMBER','IDGAME','IDCHANNEL','USERDESC','DATEREG','HELPER','PLAYER','STATUS'], ["'" + str(MyMember[i].MemberId) + "'" , str(nIdGame) , "'" + str(cIdChannel) + "'", "'" + str(MyMember[i].MemberName) + "'" , "'" + Self.Get_Time() + "'" , "'N'", "'Y'", "'OK'"], None, None)
+
+            #oConection.commit()
+        
+
     def Get_Point_Rule(Self, cPointCode: str) -> list:
         nIdGame = []
         #look up for a point rule
@@ -168,7 +286,7 @@ class OperDiscord(commands.Cog):
         
         for OneRow in oData:            
             nIdGame = OneRow[0]#IdGame
-        return [nIdGame, oData]        
+        return [oData, nIdGame]        
     
     def GetChannelId(Self, cChannelName: str) -> str:
         cChannel = ''
@@ -184,8 +302,8 @@ class OperDiscord(commands.Cog):
 
         for OneRow in oData:            
             #nIdGame = OneRow[0]#IdGame
-            nIdMember = OneRow[1]#IdMember
-
+            nIdMember = str(OneRow[1])#IdMember
+        oData.close()
         if len(nIdMember) <= 0:
             return False
         elif len(nIdMember) > 0:
@@ -331,7 +449,10 @@ class OperDiscord(commands.Cog):
         oConection.close()
 
         #update the state's user in the table DISCORD_USER to OUT
-        OperationDB('UPD', 'GAME', "STATUS = 'END'", None, "IDGAME = " + str(nIdGame), None)   
+        OperationDB('UPD', 'GAME', "STATUS = 'END'", None, "IDGAME = " + str(nIdGame), None)
+        
+        #kick out all member from the game by the status: OK -> OUT
+        OperationDB('UPD', 'DISCORD_USER', "STATUS = 'OUT'", None, "IDGAME = " + str(nIdGame), None)
 
         await foo.PostGeneralInfo(ctx, 'GAME OVER', "The Three Questions' Game",["Game over, thanks for participating!", "Juego finalizado, gracias por participar!"])
 
@@ -395,8 +516,9 @@ class OperDiscord(commands.Cog):
         oSelect = []
         oSelect = foo.Get_Point_Rule(cPointCode.upper())#find a point rule
         
-        nIdPoint = oSelect[0]
-        oConection = oSelect[1]    
+        oConection = oSelect[0]
+        nIdPoint = oSelect[1]
+        
 
         if oSelect is None:
             ctx.send('Point Rule parameter is incorrect')
@@ -488,7 +610,8 @@ async def on_voice_state_update(member:discord.Member, before, after):
         
         oConection = oSelect[0]
         nIdGame = oSelect[1]        
-        
+        oConection.close()
+
         print('event before oConection.rowcount: ' + str(oConection.rowcount))
         
         oSelect = []
@@ -784,5 +907,55 @@ async def stop(ctx):#Sop Timer
         await ctx.send(embed=embed)
 
         await foo.ShowScoreCard(ctx)
+
+@bot.command()#Give permission's commands to an user
+async def giverole(ctx, cIdMember: str, cRoleCode: str):
+
+    #bStatus = False
+    
+    #bStatus = foo.Get_GameStatus()#if not exists a OK's game, then show a warning's message and cannot continues
+
+    #print('bStatus: ' + str(bStatus))
+    #if bStatus == False:#find a active game
+    #    await foo.PostGeneralInfo(ctx, 'WARNING', "Doesn't exists a game started",["You need start a new game with: !startgame"])
+    #    return
+
+    cMemberLocal = cIdMember
+    cMemberLocal = cMemberLocal.replace('@','')
+    cMemberLocal = cMemberLocal.replace('<','')
+    cMemberLocal = cMemberLocal.replace('>','')   
+    
+    #OperationDB('INS', 'TIMER_RULE', ['STATUS'],["'OK'"], None, None)
+    #OperationDB('INS', 'ROLE_USERID', ['STATUS'],[ "'OK'"], None, None)                    
+
+    #OperationDB('INS', 'TIMER_RULE', ['STATUS'], ["'OK'"], None, None)
+
+    await foo.GRoleUser(ctx,cMemberLocal, cRoleCode)
+
+@bot.command()#Revoke permission's commands to an user
+async def removerole(ctx, cIdMember: str, cCommand: str, cRoleCode: str):
+    bStatus = False
+    
+    bStatus = foo.Get_GameStatus()#if not exists a OK's game, then show a warning's message and cannot continues
+    
+    #print('bStatus: ' + str(bStatus))
+    if bStatus == False:#find a active game
+        await foo.PostGeneralInfo(ctx, 'WARNING', "Doesn't exists a game started",["You need start a new game with: !startgame"])
+        return
+
+    #await foo.GRoleUser(ctx,cIdMember, cCommand, cRoleCode)
+
+@bot.command()#Revoke permission's commands to an user
+async def clonerole(ctx, cIdMember: str, cCommand: str):
+    bStatus = False
+    
+    bStatus = foo.Get_GameStatus()#if not exists a OK's game, then show a warning's message and cannot continues
+    
+    #print('bStatus: ' + str(bStatus))
+    if bStatus == False:#find a active game
+        await foo.PostGeneralInfo(ctx, 'WARNING', "Doesn't exists a game started",["You need start a new game with: !startgame"])
+        return
+
+    #await foo.GRoleUser(ctx,cIdMember, cCommand)
 
 bot.run(format(env['BOT_TOKEN']))#Start the Bot

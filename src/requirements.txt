@@ -1,0 +1,17 @@
+discord.py==2.1.1
+discord.ext 
+    import 
+    commands
+datetime
+datetime 
+    import 
+    datetime
+dotenv 
+    load_dotenv
+os 
+    environ
+OperDb
+    OperationDB
+TimeKeeper 
+    starttimer
+    stoptimer

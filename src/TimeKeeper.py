@@ -66,20 +66,35 @@ def GetTimeConf():
     
     return [oData, nTimeReachPres, nTimeLimitPres, nTimeReachQuestion, nTimeLimitQuestion, nTimerLimit]            
     
+def GetGlobalVar():
+    oConection = None
+    oSelect = []
+    oSelect = GetTimeConf()
 
-oConection = None
-oSelect = []
-oSelect = GetTimeConf()
+    oConection = oSelect[0]
 
-oConection = oSelect[0]
-nTimeReachPres = int(oSelect[1])
-nTimeLimitPres = int(oSelect[2])
-nTimeReachQuestion = int(oSelect[3])
-nTimeLimitQuestion = int(oSelect[4])
-nTimerLimit = int(oSelect[5])
+    global nTimeReachPres
+    global nTimeLimitPres
+    global nTimeReachQuestion
+    global nTimeLimitQuestion
+    global nTimerLimit
+
+    nTimeReachPres = int(oSelect[1])
+    nTimeLimitPres = int(oSelect[2])
+    nTimeReachQuestion = int(oSelect[3])
+    nTimeLimitQuestion = int(oSelect[4])
+    nTimerLimit = int(oSelect[5])
+    oConection.close()
 #print('nTimeReachPres: ' + str(nTimeReachPres))
 
 def Select_Role(sProcedure : str):
+    GetGlobalVar()
+    global nTimeReachPres
+    global nTimeLimitPres
+    global nTimeReachQuestion
+    global nTimeLimitQuestion
+    global nTimerLimit
+
     if sProcedure.upper() == 'P':
         return [nTimeReachPres, nTimeLimitPres]
     elif sProcedure.upper() == 'Q':
@@ -92,6 +107,12 @@ def Seconds_to_TimeFormat(nSec : int):
 
 @bot.command(pass_context=True)
 async def RuleTime(ctx, cProcedure : str, sUser : str):
+    GetGlobalVar()
+    global nTimeReachPres
+    global nTimeLimitPres
+    global nTimeReachQuestion
+    global nTimeLimitQuestion
+    global nTimerLimit    
     #print('ruletime')
     if cProcedure.upper() == 'P':
             
@@ -111,6 +132,12 @@ async def LastMessage(ctx, LastTime : int):
 
 @bot.command(pass_context=True)
 async def RuleLoop(ctx, nTime : int, sProcedure : str):
+    GetGlobalVar()
+    global nTimeReachPres
+    global nTimeLimitPres
+    global nTimeReachQuestion
+    global nTimeLimitQuestion
+    global nTimerLimit
 
     nTimeSel = Select_Role(sProcedure)
     nTimeReach = nTimeSel[0]
