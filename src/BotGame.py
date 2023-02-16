@@ -61,11 +61,6 @@ class OperDiscord(commands.Cog):
             Self.UserDesc = UserDesc
             Self.nPointTotal = nPointTotal
 
-    class UserRoleDetail():
-        def __init__(Self, RoleId, BotCommand):
-            Self.RoleId = RoleId
-            Self.BotCommand = BotCommand
-
     def __init__(Self, bot):
         Self.bot = bot  
         Self.MyChannel = []
@@ -185,7 +180,7 @@ class OperDiscord(commands.Cog):
 
     async def GRoleUser(Self, ctx, cIdMember: str, cRoleCode: str):    
         print('application_id: ' + str(bot.application_id))
-        MyRoleCommand = []
+        #MyRoleCommand = []
     
         oConection = None
         oSelect = []
@@ -194,24 +189,19 @@ class OperDiscord(commands.Cog):
         nIdGame = oSelect[1]
         oConection.close() 
       
-        
-        #nIdGame = 13
-        #bValidate = foo.Validate_User(cIdMember, nIdGame)#Validate if the user is into the game
+        bValidate = foo.Validate_User(cIdMember, nIdGame)#Validate if the user is into the game
 
-        #if bValidate == False:
-        #    await ctx.send("User is not in the game, check out!")
-        #    return
+        if bValidate == False:
+            await ctx.send("User is not in the game, check out!")
+            return
       
-        #cRoleCodeUp = cRoleCode.upper()
+        cRoleCodeUp = cRoleCode.upper()
         
-        #oData = None
         oSelect = []
-
-        #oData = Self.GetRoleCode(bot.application_id, cRoleCodeUp)#Look up the Role Id permition
 
         oData = None
 
-        oData = OperationDB('SEL', 'BOT_ROLE', ['ROLEID', 'BOT_COMMAND'], None, "ROLEID = (SELECT ROLEID FROM HELPER_ROLE WHERE HELPERCODE = '"+ 'TK' +"') AND APLICATIONID = '"+ str(bot.application_id) +"'", None)        
+        oData = OperationDB('SEL', 'BOT_ROLE', ['ROLEID', 'BOT_COMMAND'], None, "ROLEID = (SELECT ROLEID FROM HELPER_ROLE WHERE HELPERCODE = '"+ cRoleCodeUp +"') AND APLICATIONID = '"+ str(bot.application_id) +"'", None)        
         
         dblista = []
 
@@ -224,60 +214,125 @@ class OperDiscord(commands.Cog):
 
         #print(dblista[0][0], dblista[0][1])
 
-
         oData.close()
         
         cAplicationId = bot.application_id
 
-        for i in range(len(dblista)):
+        for i in range(len(dblista)):#data from BOT_ROLE
             print(dblista[i][0], dblista[i][1])#1st [] -> row / 2nd [] -> column
             nIdRole = dblista[i][0]
             nBotCommand = dblista[i][1]
-            #Insert a row of a permit-role for a user selected to use a command
-            OperationDB('INS', 'ROLE_USERID', ['ROLEID','APLICATIONID','BOT_COMMAND','IDGAME','IDMEMBER','STATUS'],[str(nIdRole), "'"+ str(cAplicationId) + "'", "'"+ str(nBotCommand) + "'", str(nIdGame), "'"+ cIdMember + "'", "'OK'"], None, None)            
-
-            #cIdMember
 
             #Insert a row of a permit-role for a user selected to use a command
-            #OperationDB('INS', 'ROLE_USERID', ['ROLEID','APLICATIONID','BOT_COMMAND','IDGAME','IDMEMBER','STATUS'],[str(nIdRole), "'"+ str(cAplicationId) + "'", "'"+ str(nBotCommand) + "'", str(nIdGame), "'"+ '0947489734785' + "'", "'OK'"], None, None)  
+            OperationDB('INS', 'USER_BOT_ROLE', ['ROLEID','APLICATIONID','BOT_COMMAND','IDGAME','IDMEMBER','STATUS'],[str(nIdRole), "'"+ str(cAplicationId) + "'", "'"+ str(nBotCommand) + "'", str(nIdGame), "'"+ cIdMember + "'", "'OK'"], None, None)
+    
+    async def PostRole(Self, ctx):
 
-            #Insert a row of a permit-role for a user selected to use a command
-            #OperationDB('INS', 'ROLE_USERID', ['APLICATIONID'],[str('79873454353489')], None, None)                    
+        oConection = None
+        oSelect = []
+        oSelect = Self.Get_Game_OK()#find a active game
+        oConection = oSelect[0]
+        nIdGame = oSelect[1]
+        oConection.close() 
 
-        #oConection = oSelect[0]
-        #nIdRole = oSelect[1]
-        #nBotCommand = oSelect[2]
-        
-        
-        #oConection = oSelect[0]
-        #nIdRole = oSelect[1]
-        #nIdRole = ''
-        #nBotCommand = ''
+
+        oData = None
+
         cAplicationId = bot.application_id
-        '''
-        for OneRow in MyRoleCommand:
-        #for i in range(len(dblista)):
-            #print(OneRow)
-            nIdRole = OneRow.RoleId
-            nBotCommand = OneRow.BotCommand
-            '''
-        for i in range(len(MyRoleCommand)):
-        #for i in range(len(dblista)):
-            #print(OneRow)
-            nIdRole = MyRoleCommand[i].RoleId
-            nBotCommand = MyRoleCommand[i].BotCommand            
-            #nIdRole = OneRow[0]
-            #nBotCommand = OneRow[1]
-            print('nIdRole: ' + str(nIdRole) + ' nBotCommand: ' + str(nBotCommand))
-            #Insert a row of a permit-role for a user selected to use a command
-            #OperationDB('INS', 'ROLE_USERID', ['ROLEID','APLICATIONID','BOT_COMMAND','IDGAME','IDMEMBER','STATUS'],[str(nIdRole), "'"+ str(cAplicationId) + "'", "'"+ str(nBotCommand) + "'", str(nIdGame), "'"+ cIdMember + "'", "'OK'"], None, None)
-            
-            #Insert into ROLE_USERID(ROLEID,APLICATIONID,BOT_COMMAND,IDGAME,IDMEMBER,STATUS) values (2,'1071451684691263538','start',13,'705234368758808660','OK')
 
-            #OperationDB('INS', 'DISCORD_USER', ['IDMEMBER','IDGAME','IDCHANNEL','USERDESC','DATEREG','HELPER','PLAYER','STATUS'], ["'" + str(MyMember[i].MemberId) + "'" , str(nIdGame) , "'" + str(cIdChannel) + "'", "'" + str(MyMember[i].MemberName) + "'" , "'" + Self.Get_Time() + "'" , "'N'", "'Y'", "'OK'"], None, None)
-
-            #oConection.commit()
+        oData = OperationDB('SEL', "(SELECT R.ROLENAME, D.USERDESC FROM DISCORD_USER D,(Select UB.ROLEID, HR.ROLENAME, UB.IDMEMBER, UB.IDGAME from HELPER_ROLE HR, USER_BOT_ROLE UB Where UB.IDGAME = " + str(nIdGame) + " AND UB.STATUS = 'OK' AND UB.ROLEID = HR.ROLEID AND APLICATIONID = '"+ str(cAplicationId) +"' GROUP BY UB.ROLEID, HR.ROLENAME, UB.IDMEMBER) R WHERE R.IDMEMBER = D.IDMEMBER AND R.IDGAME = D.IDGAME AND D.STATUS = 'OK')", ['ROLENAME','USERDESC'], None, None, None)
         
+        dblista = []
+
+        for OneRow in oData:
+            #print(OneRow)
+            #dblista = [OneRow[0],OneRow[1]]
+            dblista.append(list(OneRow))
+        
+        #print(dblista)
+
+        #print(dblista[0][0], dblista[0][1])
+
+        oData.close()        
+
+        embed = discord.Embed(title='', description="The Three Questions' Game", color=discord.Color.blue())
+        
+        embed.set_thumbnail(url="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvlJsqbDBYjobCSePQghhuHn6Ph5eDhQql6Q&usqp=CAU")        
+
+        for i in range(len(dblista)):#data from BOT_ROLE
+            print(dblista[i][0], dblista[i][1])#1st [] -> row / 2nd [] -> column
+            cRoleName = dblista[i][0]
+            cUserDesc = dblista[i][1]    
+            embed.add_field(name=str(cRoleName) + ':', value=f"{str(cUserDesc)}")
+
+        await ctx.send(embed=embed)        
+
+    async def PostRoleMissing(Self, ctx):
+        oConection = None
+        oSelect = []
+        oSelect = Self.Get_Game_OK()#find a active game
+        oConection = oSelect[0]
+        nIdGame = oSelect[1]
+        oConection.close() 
+
+
+        oData = None
+
+        cAplicationId = bot.application_id
+
+        oData = OperationDB('SEL', "HELPER_ROLE HR", ['ROLENAME','DESCRIPTION','HELPERCODE'], None, "NOT EXISTS(SELECT 'S' from USER_BOT_ROLE UB Where UB.IDGAME = "+ str(nIdGame) +" AND UB.STATUS = 'OK' AND UB.ROLEID = HR.ROLEID AND UB.APLICATIONID = '"+ str(cAplicationId) +"')", None)
+        
+        dblista = []
+
+        for OneRow in oData:
+            #print(OneRow)
+            #dblista = [OneRow[0],OneRow[1]]
+            dblista.append(list(OneRow))
+        
+        #print(dblista)
+
+        #print(dblista[0][0], dblista[0][1])
+
+        oData.close()        
+
+        embed = discord.Embed(title='We need Helpers, por favor!', description="The Three Questions' Game", color=discord.Color.blue())
+        
+        embed.set_thumbnail(url="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvlJsqbDBYjobCSePQghhuHn6Ph5eDhQql6Q&usqp=CAU")        
+        
+
+        for i in range(len(dblista)):#data from BOT_ROLE
+            #embed.add_field(name = '',value=':orange_book: :orange_book:   :orange_book:   :orange_book:\n')
+            
+            print(dblista[i][0], dblista[i][1])#1st [] -> row / 2nd [] -> column
+            
+            cRoleName = dblista[i][0]
+            cDescription = dblista[i][1]    
+            cHelperCode = dblista[i][2]    
+            
+            embed.add_field(name='', value=f"Can anybody please be the **{str(cRoleName)}**(*** {str(cHelperCode)} ***)?\n")
+            
+            embed.add_field(name='', value=f"***{str(cDescription)}***")
+
+            #embed.add_field(name = '',value=':orange_book: :orange_book:   :orange_book:   :orange_book:\n')
+        
+        await ctx.send(embed=embed)   
+
+    async def RemoveRoleUser(Self, ctx, cIdMember: str, cRoleCode: str): 
+        oConection = None
+        oSelect = []
+        oSelect = Self.Get_Game_OK()#find a active game
+        oConection = oSelect[0]
+        nIdGame = oSelect[1]
+        oConection.close() 
+      
+        bValidate = foo.Validate_User(cIdMember, nIdGame)#Validate if the user is into the game
+
+        if bValidate == False:
+            await ctx.send("User is not in the game, check out!")
+            return
+
+        #kick out all member from the game by the status: OK -> OUT
+        OperationDB('UPD', 'USER_BOT_ROLE', "STATUS = 'OUT'", None, "IDGAME = " + str(nIdGame), None)      
 
     def Get_Point_Rule(Self, cPointCode: str) -> list:
         nIdGame = []
@@ -907,6 +962,16 @@ async def stop(ctx):#Sop Timer
         await ctx.send(embed=embed)
 
         await foo.ShowScoreCard(ctx)
+
+@bot.command()
+#Post the permitions of the users
+async def inforole(ctx):
+    await foo.PostRole(ctx)
+    await foo.PostRoleMissing(ctx)
+
+@bot.command()
+async def inforolemissing(ctx):    
+    await foo.PostRoleMissing(ctx)
 
 @bot.command()#Give permission's commands to an user
 async def giverole(ctx, cIdMember: str, cRoleCode: str):
