@@ -26,21 +26,7 @@ intents.message_content = True
 intents.members = True
 bot = commands.Bot(command_prefix='!', description="This is a helper bot",intents= intents)
 
-
-class Events(commands.Cog):
-        def __init__(Self, bot):
-            Self.bot = bot
-            print('event')
-
-        @commands.Cog.listener()
-        async def on_ready(Self):
-            print('Ready!')
-            print('Logged in as ---->', Self.bot.user)
-            print('ID:', Self.bot.user.id)
-
-        @commands.Cog.listener()
-        async def on_message(Self, message):
-            print(message)            
+cFunctionName = '' 
 
 class OperDiscord(commands.Cog):
 
@@ -85,6 +71,7 @@ class OperDiscord(commands.Cog):
     #    print('on_ready')
     #    print('We have logged in as {}'.format(Self.bot.user))
     #    await Self.bot.change_presence(activity=discord.Streaming(name="Three Questions' Game",url=""))
+
 
     async def PostGeneralInfo(Self, ctx, cHeader: str, DescHeader: str, oField):
         embed = discord.Embed(title=cHeader, description=DescHeader, color=discord.Color.blue())
@@ -176,9 +163,109 @@ class OperDiscord(commands.Cog):
             return True
         elif len(cStatus) <= 0:
             return False
-                           
 
-    async def GRoleUser(Self, ctx, cIdMember: str, cRoleCode: str):    
+    def ValidateRoleByCommand(Self, cMemberId: str, cCommand: str, nIdGame: str, cAplicationId: str):
+
+        oData = None
+
+        #oData = OperationDB('SEL', 'USER_BOT_ROLE', ["'Y' VALIDATE"], None, "IDMEMBER = '"+ str(cMemberId) +"' AND BOT_COMMAND = '"+ cCommand +"' AND IDGAME = "+ str(nIdGame) +" AND APLICATIONID = '"+ str(cAplicationId) +"'", None)
+
+        oData = OperationDB('SEL', 'USER_BOT_ROLE', ["'Y' VALIDATE"], None, "IDMEMBER = '"+ str(cMemberId) +"' AND BOT_COMMAND = '"+ cCommand +"' AND APLICATIONID = '"+ str(cAplicationId) +"'", None)
+        
+        dblista = []
+
+        for OneRow in oData:
+            #print(OneRow)
+            #dblista = [OneRow[0],OneRow[1]]
+            dblista.append(list(OneRow))
+        
+        #print(dblista)
+
+        #print(dblista[0][0], dblista[0][1])
+
+        oData.close()
+        
+        #cAplicationId = bot.application_id
+        cValidate = ''
+        for i in range(len(dblista)):#data from BOT_ROLE
+            #print(dblista[i][0], dblista[i][1])#1st [] -> row / 2nd [] -> column
+            cValidate = dblista[i][0]  
+
+        if len(cValidate) <= 0:
+            return False
+        elif len(cValidate) > 0:
+            return True           
+                           
+    async def CloneRoleUser(Self, ctx, cIdMember: str, cRoleCode: str):
+        pass
+
+    def ValidateRoleUser(Self, cIdMember: str, cRoleCode: str) -> bool:
+        oConection = None
+        oSelect = []
+        oSelect = Self.Get_Game_OK()#find a active game
+        oConection = oSelect[0]
+        nIdGame = oSelect[1]
+        oConection.close()         
+
+        oData = None
+
+        oData = OperationDB('SEL', 'USER_BOT_ROLE', ["'Y' VALIDATE"], None, "ROLEID = (SELECT ROLEID FROM HELPER_ROLE WHERE HELPERCODE = '"+ str(cRoleCode.upper()) +"') AND IDGAME = "+ str(nIdGame) +" AND STATUS = 'OK'", "GROUP BY 1")
+
+        dblista = []
+
+        for OneRow in oData:
+            #print(OneRow)
+            #dblista = [OneRow[0],OneRow[1]]
+            dblista.append(list(OneRow))
+        
+        #print(dblista)
+
+        #print(dblista[0][0], dblista[0][1])
+
+        oData.close()
+        
+        #cAplicationId = bot.application_id
+        cValidate = ''
+        for i in range(len(dblista)):#data from BOT_ROLE
+            #print(dblista[i][0], dblista[i][1])#1st [] -> row / 2nd [] -> column
+            cValidate = dblista[i][0]  
+
+        if len(cValidate) <= 0:
+            return False
+        elif len(cValidate) > 0:
+            return True                      
+        
+    def ValidateRoleOut(Self, cIdMember: str, cBotCommand: str, nIdGame: str, cAplicationId: str):
+        oData = None
+
+        oData = OperationDB('SEL', 'USER_BOT_ROLE', ["'Y' VALIDATE"], None, "IDMEMBER = '"+ str(cIdMember) +"' AND BOT_COMMAND = '"+ str(cBotCommand) +"' AND IDGAME = "+ str(nIdGame) +" AND APLICATIONID = '"+ str(cAplicationId) +"'", None)        
+        
+        dblista = []
+
+        for OneRow in oData:
+            #print(OneRow)
+            #dblista = [OneRow[0],OneRow[1]]
+            dblista.append(list(OneRow))
+        
+        #print(dblista)
+
+        #print(dblista[0][0], dblista[0][1])
+
+        oData.close()
+        
+        cValidate = ''
+        for i in range(len(dblista)):#data from BOT_ROLE
+            #print(dblista[i][0], dblista[i][1])#1st [] -> row / 2nd [] -> column
+            cValidate = dblista[i][0]
+        
+        if len(cValidate) > 0:
+            return True
+        elif len(cValidate) <= 0:
+            return False
+            
+
+
+    async def GiveRoleUser(Self, ctx, cIdMember: str, cRoleCode: str):
         print('application_id: ' + str(bot.application_id))
         #MyRoleCommand = []
     
@@ -192,8 +279,16 @@ class OperDiscord(commands.Cog):
         bValidate = foo.Validate_User(cIdMember, nIdGame)#Validate if the user is into the game
 
         if bValidate == False:
-            await ctx.send("User is not in the game, check out!")
+            await ctx.send("User **"+ str(bot.get_user(int(cIdMember))) +"** is not in the game, check out!")
             return
+
+        bValidate = foo.ValidateRoleUser(cIdMember, cRoleCode)#Validate if the permissions are available
+
+        if bValidate == True:#Validate if the role was used
+            await ctx.send("**The role is used by other User**")
+            #await foo.PostRole(ctx)
+            #await foo.PostRoleMissing(ctx)
+            return            
       
         cRoleCodeUp = cRoleCode.upper()
         
@@ -218,14 +313,28 @@ class OperDiscord(commands.Cog):
         
         cAplicationId = bot.application_id
 
+        cValidate = None
+
         for i in range(len(dblista)):#data from BOT_ROLE
             print(dblista[i][0], dblista[i][1])#1st [] -> row / 2nd [] -> column
             nIdRole = dblista[i][0]
-            nBotCommand = dblista[i][1]
+            cBotCommand = dblista[i][1]
 
-            #Insert a row of a permit-role for a user selected to use a command
-            OperationDB('INS', 'USER_BOT_ROLE', ['ROLEID','APLICATIONID','BOT_COMMAND','IDGAME','IDMEMBER','STATUS'],[str(nIdRole), "'"+ str(cAplicationId) + "'", "'"+ str(nBotCommand) + "'", str(nIdGame), "'"+ cIdMember + "'", "'OK'"], None, None)
-    
+            cValidate = foo.ValidateRoleOut(cIdMember, cBotCommand, nIdGame, cAplicationId)
+
+            if cValidate == False:
+
+                #Insert a row of a permit-role for a user selected to use a command
+                OperationDB('INS', 'USER_BOT_ROLE', ['ROLEID','APLICATIONID','BOT_COMMAND','IDGAME','IDMEMBER','STATUS'],[str(nIdRole), "'"+ str(cAplicationId) + "'", "'"+ str(cBotCommand) + "'", str(nIdGame), "'"+ cIdMember + "'", "'OK'"], None, None)
+            
+            elif cValidate: #The role exist in the table with state OUT
+
+                #relationing a existing role of the table USER_BOT_ROLE, the status will be changed to OK
+
+                OperationDB('UPD', 'USER_BOT_ROLE', "STATUS = 'OK'", None, "IDMEMBER = '"+ str(cIdMember) +"' AND BOT_COMMAND = '"+ str(cBotCommand) +"' AND IDGAME = "+ str(nIdGame) +" AND APLICATIONID = '"+ str(cAplicationId) +"'", None)
+
+        await ctx.send('** Role asignated! **')    
+
     async def PostRole(Self, ctx):
 
         oConection = None
@@ -249,25 +358,31 @@ class OperDiscord(commands.Cog):
             #dblista = [OneRow[0],OneRow[1]]
             dblista.append(list(OneRow))
         
+        #print('oData.count ' + str(oData.rowcount()))
+
         #print(dblista)
 
         #print(dblista[0][0], dblista[0][1])
 
         oData.close()        
 
-        embed = discord.Embed(title='', description="The Three Questions' Game", color=discord.Color.blue())
+        embed = discord.Embed(title='**Helper Roles:**', description="", color=discord.Color.blue())
         
         embed.set_thumbnail(url="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvlJsqbDBYjobCSePQghhuHn6Ph5eDhQql6Q&usqp=CAU")        
 
         for i in range(len(dblista)):#data from BOT_ROLE
             print(dblista[i][0], dblista[i][1])#1st [] -> row / 2nd [] -> column
             cRoleName = dblista[i][0]
-            cUserDesc = dblista[i][1]    
-            embed.add_field(name=str(cRoleName) + ':', value=f"{str(cUserDesc)}")
+            cUserDesc = dblista[i][1]
+            embed.add_field(name=str(cRoleName) + ':', value=f"{str(cUserDesc)}", inline= False)
 
-        await ctx.send(embed=embed)        
+        await ctx.send(embed=embed)            
 
     async def PostRoleMissing(Self, ctx):
+        #function(Self)
+        global cFunctionName
+        
+
         oConection = None
         oSelect = []
         oSelect = Self.Get_Game_OK()#find a active game
@@ -295,29 +410,32 @@ class OperDiscord(commands.Cog):
 
         oData.close()        
 
-        embed = discord.Embed(title='We need Helpers, por favor!', description="The Three Questions' Game", color=discord.Color.blue())
+        embed = discord.Embed(title='We need Helpers, por favor!', description="", color=discord.Color.blue())
         
         embed.set_thumbnail(url="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvlJsqbDBYjobCSePQghhuHn6Ph5eDhQql6Q&usqp=CAU")        
         
-
+        nReg = 0
         for i in range(len(dblista)):#data from BOT_ROLE
-            #embed.add_field(name = '',value=':orange_book: :orange_book:   :orange_book:   :orange_book:\n')
+            if nReg == 0:
+                embed.add_field(name = '',value=':orange_book: :orange_book: :orange_book: :orange_book: :orange_book: :orange_book: :orange_book: :orange_book: :orange_book: :orange_book: :orange_book: :orange_book: :orange_book: :orange_book:', inline= False)
             
-            print(dblista[i][0], dblista[i][1])#1st [] -> row / 2nd [] -> column
+            nReg += 1
+
+            #print(dblista[i][0], dblista[i][1])#1st [] -> row / 2nd [] -> column
             
             cRoleName = dblista[i][0]
             cDescription = dblista[i][1]    
             cHelperCode = dblista[i][2]    
             
-            embed.add_field(name='', value=f"Can anybody please be the **{str(cRoleName)}**(*** {str(cHelperCode)} ***)?\n")
+            embed.add_field(name='', value=f"* Can anybody please be the **{str(cRoleName)}**(*** {str(cHelperCode)} ***)?\n", inline= False)
             
-            embed.add_field(name='', value=f"***{str(cDescription)}***")
+            embed.add_field(name='', value=f"*{str(cDescription)}*")
 
-            #embed.add_field(name = '',value=':orange_book: :orange_book:   :orange_book:   :orange_book:\n')
+            embed.add_field(name = '',value=':orange_book: :orange_book: :orange_book: :orange_book: :orange_book: :orange_book: :orange_book: :orange_book: :orange_book: :orange_book: :orange_book: :orange_book: :orange_book: :orange_book:', inline= False)
         
         await ctx.send(embed=embed)   
 
-    async def RemoveRoleUser(Self, ctx, cIdMember: str, cRoleCode: str): 
+    async def RemoveRoleUser(Self, ctx, cRoleCode: str): 
         oConection = None
         oSelect = []
         oSelect = Self.Get_Game_OK()#find a active game
@@ -325,14 +443,14 @@ class OperDiscord(commands.Cog):
         nIdGame = oSelect[1]
         oConection.close() 
       
-        bValidate = foo.Validate_User(cIdMember, nIdGame)#Validate if the user is into the game
+        #bValidate = foo.Validate_User(cIdMember, nIdGame)#Validate if the user is into the game
 
-        if bValidate == False:
-            await ctx.send("User is not in the game, check out!")
-            return
+        #if bValidate == False:
+        #    await ctx.send("User is not in the game, check out!")
+        #    return
 
         #kick out all member from the game by the status: OK -> OUT
-        OperationDB('UPD', 'USER_BOT_ROLE', "STATUS = 'OUT'", None, "IDGAME = " + str(nIdGame), None)      
+        OperationDB('UPD', 'USER_BOT_ROLE', "STATUS = 'OUT'", None, "IDGAME = "+ str(nIdGame) +" AND ROLEID IN(SELECT HR.ROLEID FROM HELPER_ROLE HR WHERE HR.HELPERCODE = '"+ cRoleCode +"')", None)      
 
     def Get_Point_Rule(Self, cPointCode: str) -> list:
         nIdGame = []
@@ -508,6 +626,9 @@ class OperDiscord(commands.Cog):
         
         #kick out all member from the game by the status: OK -> OUT
         OperationDB('UPD', 'DISCORD_USER', "STATUS = 'OUT'", None, "IDGAME = " + str(nIdGame), None)
+        
+        #remove all permissions of all users of the current game
+        OperationDB('UPD', 'USER_BOT_ROLE', "STATUS = 'OUT'", None, "IDGAME = " + str(nIdGame), None)        
 
         await foo.PostGeneralInfo(ctx, 'GAME OVER', "The Three Questions' Game",["Game over, thanks for participating!", "Juego finalizado, gracias por participar!"])
 
@@ -747,10 +868,9 @@ async def on_interaction(interaction):
     #if str(interaction.type) == "InteractionType.application_command":
     print("test interactions")
 
-
 # --- main ---
 
-foo = OperDiscord(commands.Cog)#Instans a class
+foo = OperDiscord(commands.Cog)#Instance a class
 
 @bot.command()
 async def helpgame(ctx, cCommand: str):
@@ -772,7 +892,16 @@ async def helpgame(ctx, cCommand: str):
     if cCommand == 'start' or cCommand == '*':
         await foo.PostGeneralInfo(ctx, 'Command: !start', 'Parameters: Role_game @User',["Example: !start P @user01","Manage and start the timer of Presentation or Follow-Question",'Reference: * Role_game -> (ej. P = Presentation / Q = Follow-Question)','@User -> User member inside the voice room'])
     if cCommand == 'stop' or cCommand == '*':
-        await foo.PostGeneralInfo(ctx, 'Command: !stop', 'Parameters: None',["Example: !stop","stop the timer of Presentation or Follow-Question","Presentations or Follow-Questions can win score bonuses"])    
+        await foo.PostGeneralInfo(ctx, 'Command: !stop', 'Parameters: None',["Example: !stop","stop the timer of Presentation or Follow-Question","Presentations or Follow-Questions can win score bonuses"])
+    if cCommand == 'inforole' or cCommand == '*':
+        await foo.PostGeneralInfo(ctx, 'Command: !inforole', 'Parameters: None',["Example: !inforole","Show information about roles and permissions assigned to a user"])
+    if cCommand == 'postjob' or cCommand == '*':
+        await foo.PostGeneralInfo(ctx, 'Command: !postjob', 'Parameters: None',["Example: !postjob","Post a job application as a helper"])
+    if cCommand == 'giverole' or cCommand == '*':
+        await foo.PostGeneralInfo(ctx, 'Command: !giverole', 'Parameters: @User RoleJob',["Example: !giverole @user TK","Give permissions by roles to a user and can use commands related a role",'Reference: * @User -> User member inside the voice room','RoleJob -> (ej. CH = CO-HOSTER / TK = TIMEKEEPER / SK = SCOREKEEPER / CP = COPY-PASTER / DP = DICTIONARY-PERSON)'])
+    if cCommand == 'removerole' or cCommand == '*':
+        await foo.PostGeneralInfo(ctx, 'Command: !removerole', 'Parameters: RoleJob',["Example: !removerole SK","Remove permissions Assigned to a user",'Reference: * RoleJob -> Assigned role'])        
+
 
 @bot.command()
 async def startgame(ctx):
@@ -783,6 +912,29 @@ async def startgame(ctx):
 
     Description: Start the Three Questions' Game
     """
+    cOwner = ['780821223063027755','705234368758808660']
+
+    if not (ctx.author.id in cOwner):
+
+        ###########################################
+        #Validate roles permissions
+        ###########################################
+        oConection = None
+        oSelect = []
+        oSelect = foo.Get_Game_OK()#find a active game
+        oConection = oSelect[0]
+        nIdGame = oSelect[1]
+        oConection.close() 
+
+        cFunctionName =  startgame.name#Function name to be using look up role and permissions
+
+        bValidate = foo.ValidateRoleByCommand(ctx.author.id, cFunctionName, nIdGame, bot.application_id)
+
+        if bValidate == False:#Validate if the role was used
+            await ctx.send("THE USER ( "+ str(ctx.author) +" ) **DOESN'T HAVE PERMISSION** TO USING: **"+ str(cFunctionName)+"**")
+            return  
+        ###########################################     
+
     bStatus = False
 
     bStatus = foo.Get_GameStatus()
@@ -793,6 +945,10 @@ async def startgame(ctx):
 
     await foo.strtgame(ctx)
 
+    #Give Owner's permission to the designated users like Owners    
+    await foo.GiveRoleUser(ctx,'705234368758808660', 'OG')
+    await foo.GiveRoleUser(ctx,'780821223063027755', 'OG')
+
 @bot.command()
 async def stopgame(ctx):
     """
@@ -800,6 +956,25 @@ async def stopgame(ctx):
 
     Example: !stopgame
     """
+
+    ###########################################
+    #Validate roles permissions
+    ###########################################
+    oConection = None
+    oSelect = []
+    oSelect = foo.Get_Game_OK()#find a active game
+    oConection = oSelect[0]
+    nIdGame = oSelect[1]
+    oConection.close() 
+
+    cFunctionName =  stopgame.name#Function name to be using look up role and permissions
+
+    bValidate = foo.ValidateRoleByCommand(ctx.author.id, cFunctionName, nIdGame, bot.application_id)
+
+    if bValidate == False:#Validate if the role was used
+        await ctx.send("THE USER ( "+ str(ctx.author) +" ) **DOESN'T HAVE PERMISSION** TO USING: **"+ str(cFunctionName)+"**")
+        return  
+    ###########################################      
 
     bStatus = False
     
@@ -819,7 +994,27 @@ async def gamestatus(ctx):
     Description: show the status of the game (Active / Inactive)
     """
 
+    ###########################################
+    #Validate roles permissions
+    ###########################################
+    oConection = None
+    oSelect = []
+    oSelect = foo.Get_Game_OK()#find a active game
+    oConection = oSelect[0]
+    nIdGame = oSelect[1]
+    oConection.close() 
+
+    cFunctionName =  gamestatus.name#Function name to be using look up role and permissions
+
+    bValidate = foo.ValidateRoleByCommand(ctx.author.id, cFunctionName, nIdGame, bot.application_id)
+
+    if bValidate == False:#Validate if the role was used
+        await ctx.send("THE USER ( "+ str(ctx.author) +" ) **DOESN'T HAVE PERMISSION** TO USING: **"+ str(cFunctionName)+"**")
+        return  
+    ###########################################  
+
     bStatus = foo.Get_GameStatus()
+    
     print('bStatus: ' + str(bStatus))
     if bStatus:#find a active game
         embed = discord.Embed(title='', description="The Three Questions' Game", color=discord.Color.blue())
@@ -844,6 +1039,25 @@ async def gamestatus(ctx):
 @bot.command()#Regitry a score
 async def savescore(ctx, cPointCode: str, cMemberId: str, nPoint: int):
 
+    ###########################################
+    #Validate roles permissions
+    ###########################################
+    oConection = None
+    oSelect = []
+    oSelect = foo.Get_Game_OK()#find a active game
+    oConection = oSelect[0]
+    nIdGame = oSelect[1]
+    oConection.close() 
+
+    cFunctionName =  savescore.name#Function name to be using look up role and permissions
+
+    bValidate = foo.ValidateRoleByCommand(ctx.author.id, cFunctionName, nIdGame, bot.application_id)
+
+    if bValidate == False:#Validate if the role was used
+        await ctx.send("THE USER ( "+ str(ctx.author) +" ) **DOESN'T HAVE PERMISSION** TO USING: **"+ str(cFunctionName)+"**")
+        return  
+    ###########################################   
+
     bStatus = False
     
     bStatus = foo.Get_GameStatus()
@@ -856,6 +1070,25 @@ async def savescore(ctx, cPointCode: str, cMemberId: str, nPoint: int):
 
 @bot.command()
 async def infogame(ctx):#Post scorecard
+
+    ###########################################
+    #Validate roles permissions
+    ###########################################
+    oConection = None
+    oSelect = []
+    oSelect = foo.Get_Game_OK()#find a active game
+    oConection = oSelect[0]
+    nIdGame = oSelect[1]
+    oConection.close() 
+
+    cFunctionName =  infogame.name#Function name to be using look up role and permissions
+
+    bValidate = foo.ValidateRoleByCommand(ctx.author.id, cFunctionName, nIdGame, bot.application_id)
+
+    if bValidate == False:#Validate if the role was used
+        await ctx.send("THE USER ( "+ str(ctx.author) +" ) **DOESN'T HAVE PERMISSION** TO USING: **"+ str(cFunctionName)+"**")
+        return  
+    ###########################################   
 
     bStatus = False
     
@@ -872,6 +1105,26 @@ cProcedureGlobal = ''
 
 @bot.command()
 async def start(ctx, cProcedure: str, cUser: str):#start timer
+
+    ###########################################
+    #Validate roles permissions
+    ###########################################
+    oConection = None
+    oSelect = []
+    oSelect = foo.Get_Game_OK()#find a active game
+    oConection = oSelect[0]
+    nIdGame = oSelect[1]
+    oConection.close() 
+
+    cFunctionName =  start.name#Function name to be using look up role and permissions
+
+    bValidate = foo.ValidateRoleByCommand(ctx.author.id, cFunctionName, nIdGame, bot.application_id)
+
+    if bValidate == False:#Validate if the role was used
+        await ctx.send("THE USER ( "+ str(ctx.author) +" ) **DOESN'T HAVE PERMISSION** TO USING: **"+ str(cFunctionName)+"**")
+        return  
+    ###########################################   
+
     global cMemberGlobal
     global cProcedureGlobal
 
@@ -909,6 +1162,26 @@ async def start(ctx, cProcedure: str, cUser: str):#start timer
 
 @bot.command()
 async def stop(ctx):#Sop Timer
+
+    ###########################################
+    #Validate roles permissions
+    ###########################################
+    oConection = None
+    oSelect = []
+    oSelect = foo.Get_Game_OK()#find a active game
+    oConection = oSelect[0]
+    nIdGame = oSelect[1]
+    oConection.close() 
+
+    cFunctionName =  stop.name#Function name to be using look up role and permissions
+
+    bValidate = foo.ValidateRoleByCommand(ctx.author.id, cFunctionName, nIdGame, bot.application_id)
+
+    if bValidate == False:#Validate if the role was used
+        await ctx.send("THE USER ( "+ str(ctx.author) +" ) **DOESN'T HAVE PERMISSION** TO USING: **"+ str(cFunctionName)+"**")
+        return  
+    ###########################################   
+
     global cMemberGlobal
     global cProcedureGlobal
 
@@ -964,41 +1237,118 @@ async def stop(ctx):#Sop Timer
         await foo.ShowScoreCard(ctx)
 
 @bot.command()
-#Post the permitions of the users
+#Post the permissions of the users
 async def inforole(ctx):
+    ###########################################
+    #Validate roles permissions
+    ###########################################
+    oConection = None
+    oSelect = []
+    oSelect = foo.Get_Game_OK()#find a active game
+    oConection = oSelect[0]
+    nIdGame = oSelect[1]
+    oConection.close() 
+
+    cFunctionName =  inforole.name#Function name to be using look up role and permissions
+
+    bValidate = foo.ValidateRoleByCommand(ctx.author.id, cFunctionName, nIdGame, bot.application_id)
+
+    if bValidate == False:#Validate if the role was used
+        await ctx.send("THE USER ( "+ str(ctx.author) +" ) **DOESN'T HAVE PERMISSION** TO USING: **"+ str(cFunctionName)+"**")
+        return  
+    ###########################################        
+
     await foo.PostRole(ctx)
     await foo.PostRoleMissing(ctx)
 
+
 @bot.command()
-async def inforolemissing(ctx):    
+async def postjob(ctx):    
+
+    ###########################################
+    #Validate roles permissions
+    ###########################################
+    oConection = None
+    oSelect = []
+    oSelect = foo.Get_Game_OK()#find a active game
+    oConection = oSelect[0]
+    nIdGame = oSelect[1]
+    oConection.close() 
+
+    cFunctionName =  postjob.name#Function name to be using look up role and permissions
+
+    bValidate = foo.ValidateRoleByCommand(ctx.author.id, cFunctionName, nIdGame, bot.application_id)
+
+    if bValidate == False:#Validate if the role was used
+        await ctx.send("THE USER ( "+ str(ctx.author) +" ) **DOESN'T HAVE PERMISSION** TO USING: **"+ str(cFunctionName)+"**")
+        return  
+    ###########################################   
+
     await foo.PostRoleMissing(ctx)
 
 @bot.command()#Give permission's commands to an user
 async def giverole(ctx, cIdMember: str, cRoleCode: str):
+    print('ctx.author.id: '+ str(ctx.author.id))
+
+    ###########################################
+    #Validate roles permissions
+    ###########################################
+    oConection = None
+    oSelect = []
+    oSelect = foo.Get_Game_OK()#find a active game
+    oConection = oSelect[0]
+    nIdGame = oSelect[1]
+    oConection.close() 
+
+    cFunctionName =  giverole.name#Function name to be using look up role and permissions
+
+    bValidate = foo.ValidateRoleByCommand(ctx.author.id, cFunctionName, nIdGame, bot.application_id)
+
+    if bValidate == False:#Validate if the role was used
+        await ctx.send("THE USER ( "+ str(ctx.author) +" ) **DOESN'T HAVE PERMISSION** TO USING: **"+ str(cFunctionName)+"**")
+        return  
+    ###########################################    
 
     #bStatus = False
     
-    #bStatus = foo.Get_GameStatus()#if not exists a OK's game, then show a warning's message and cannot continues
+    bStatus = foo.Get_GameStatus()#if not exists a OK's game, then show a warning's message and cannot continues
 
     #print('bStatus: ' + str(bStatus))
-    #if bStatus == False:#find a active game
-    #    await foo.PostGeneralInfo(ctx, 'WARNING', "Doesn't exists a game started",["You need start a new game with: !startgame"])
-    #    return
-
+    if bStatus == False:#find a active game
+        await foo.PostGeneralInfo(ctx, 'WARNING', "Doesn't exists a game started",["You need start a new game with: !startgame"])
+        return
+ 
     cMemberLocal = cIdMember
     cMemberLocal = cMemberLocal.replace('@','')
     cMemberLocal = cMemberLocal.replace('<','')
-    cMemberLocal = cMemberLocal.replace('>','')   
-    
-    #OperationDB('INS', 'TIMER_RULE', ['STATUS'],["'OK'"], None, None)
-    #OperationDB('INS', 'ROLE_USERID', ['STATUS'],[ "'OK'"], None, None)                    
+    cMemberLocal = cMemberLocal.replace('>','')
 
-    #OperationDB('INS', 'TIMER_RULE', ['STATUS'], ["'OK'"], None, None)
-
-    await foo.GRoleUser(ctx,cMemberLocal, cRoleCode)
+    await foo.GiveRoleUser(ctx,cMemberLocal, cRoleCode)
+    #await foo.PostRole(ctx)
+    await foo.PostRoleMissing(ctx)    
 
 @bot.command()#Revoke permission's commands to an user
-async def removerole(ctx, cIdMember: str, cCommand: str, cRoleCode: str):
+async def removerole(ctx, cRoleCode: str):
+
+    ###########################################
+    #Validate roles permissions
+    ###########################################
+    oConection = None
+    oSelect = []
+    oSelect = foo.Get_Game_OK()#find a active game
+    oConection = oSelect[0]
+    nIdGame = oSelect[1]
+    oConection.close() 
+
+    cFunctionName =  removerole.name#Function name to be using look up role and permissions
+
+    bValidate = foo.ValidateRoleByCommand(ctx.author.id, cFunctionName, nIdGame, bot.application_id)
+
+    if bValidate == False:#Validate if the role was used
+        await ctx.send("THE USER ( "+ str(ctx.author) +" ) **DOESN'T HAVE PERMISSION** TO USING: **"+ str(cFunctionName)+"**")
+        return  
+    ###########################################
+
     bStatus = False
     
     bStatus = foo.Get_GameStatus()#if not exists a OK's game, then show a warning's message and cannot continues
@@ -1008,10 +1358,32 @@ async def removerole(ctx, cIdMember: str, cCommand: str, cRoleCode: str):
         await foo.PostGeneralInfo(ctx, 'WARNING', "Doesn't exists a game started",["You need start a new game with: !startgame"])
         return
 
-    #await foo.GRoleUser(ctx,cIdMember, cCommand, cRoleCode)
+    await foo.RemoveRoleUser(ctx, cRoleCode.upper())
+    await foo.PostRole(ctx)
+    await foo.PostRoleMissing(ctx)
 
 @bot.command()#Revoke permission's commands to an user
 async def clonerole(ctx, cIdMember: str, cCommand: str):
+
+    ###########################################
+    #Validate roles permissions
+    ###########################################
+    oConection = None
+    oSelect = []
+    oSelect = foo.Get_Game_OK()#find a active game
+    oConection = oSelect[0]
+    nIdGame = oSelect[1]
+    oConection.close() 
+
+    cFunctionName =  clonerole.name#Function name to be using look up role and permissions
+
+    bValidate = foo.ValidateRoleByCommand(ctx.author.id, cFunctionName, nIdGame, bot.application_id)
+
+    if bValidate == False:#Validate if the role was used
+        await ctx.send("THE USER ( "+ str(ctx.author) +" ) **DOESN'T HAVE PERMISSION** TO USING: **"+ str(cFunctionName)+"**")
+        return  
+    ###########################################
+
     bStatus = False
     
     bStatus = foo.Get_GameStatus()#if not exists a OK's game, then show a warning's message and cannot continues
@@ -1021,6 +1393,5 @@ async def clonerole(ctx, cIdMember: str, cCommand: str):
         await foo.PostGeneralInfo(ctx, 'WARNING', "Doesn't exists a game started",["You need start a new game with: !startgame"])
         return
 
-    #await foo.GRoleUser(ctx,cIdMember, cCommand)
 
 bot.run(format(env['BOT_TOKEN']))#Start the Bot
