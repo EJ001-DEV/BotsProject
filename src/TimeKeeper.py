@@ -57,7 +57,7 @@ def GetTimeConf():
     oData = OperationDB('SEL', 'TIMER_RULE', ['TimeReachPres','TimeLimitPres','TimeReachQuestion','TimeLimitQuestion','TimerLimit'], None, "STATUS = 'OK'", None)
     
     for OneRow in oData:
-        print(OneRow[0],OneRow[1],OneRow[2],OneRow[3])
+        #print(OneRow[0],OneRow[1],OneRow[2],OneRow[3])
         nTimeReachPres = OneRow[0]#IdGame
         nTimeLimitPres = OneRow[1]#IdGame
         nTimeReachQuestion = OneRow[2]#IdGame
@@ -118,13 +118,13 @@ async def RuleTime(ctx, cProcedure : str, sUser : str):
             
         timer = Seconds_to_TimeFormat(nTimeLimitPres)
 
-        await ctx.send('Limit time of the Presentation: ' + timer + ' for ' + sUser)
+        await ctx.send('INFO: Limit time of the Presentation: ' + timer + ' for ' + sUser)
 
     elif cProcedure.upper() == 'Q':
     
         timer = Seconds_to_TimeFormat(nTimeLimitQuestion)
 
-        await ctx.send('Limit time of the Follows-Questions: ' + timer + ' for ' + sUser)
+        await ctx.send('INFO: Limit time of the Follows-Questions: ' + timer + ' for ' + sUser)
 
 @bot.command(pass_context=True)
 async def LastMessage(ctx, LastTime : int):    
@@ -190,8 +190,3 @@ async def on_ready():
     await bot.change_presence(activity=discord.Streaming(name="Three Questions' Game",url=""))
     print("My Bot is ready")
 '''
-#Test Token
-#bot.run('MTA3MTU2MzkxMzI0MzY2ODU3MA.Ge86lU.s-w4u3QHqcIRWXAnoQSh3OTkukTJghlPHhtDc8')
-
-#Production Token
-#bot.run('MTA3MTQ1MTY4NDY5MTI2MzUzOA.G9psxv.e4Txs3Q_cY7atTLTzANhkJLRn_2957vG6ZFoxc')

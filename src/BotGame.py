@@ -55,24 +55,6 @@ class OperDiscord(commands.Cog):
         Self.MyChannel.append(Self.ChannelDetail('1071493292363087964', 'Study Room 1'))
         Self.MyChannel.append(Self.ChannelDetail('1071493292363087965', 'Study Room 2'))
                     
-
-        #print('init')
-        #intents = discord.Intents.all()
-        #intents.message_content = True
-        #intents.members = True
-
-        #Self.bot = commands.Bot(command_prefix='!', description="This is a helper bot",intents= intents)      
-    #def __str__(Self) -> str:
-        
-    #    return super().__str__()
-
-    #@commands.Cog.listener()
-    #async def on_ready(Self):
-    #    print('on_ready')
-    #    print('We have logged in as {}'.format(Self.bot.user))
-    #    await Self.bot.change_presence(activity=discord.Streaming(name="Three Questions' Game",url=""))
-
-
     async def PostGeneralInfo(Self, ctx, cHeader: str, DescHeader: str, oField):
         embed = discord.Embed(title=cHeader, description=DescHeader, color=discord.Color.blue())
 
@@ -80,7 +62,7 @@ class OperDiscord(commands.Cog):
 
         for row in oField:
             #print('row[0]: ' + row)
-            embed.add_field(name=row , value="")
+            embed.add_field(name=row , value="", inline = False)
 
         await ctx.send(embed=embed)        
         
@@ -170,7 +152,7 @@ class OperDiscord(commands.Cog):
 
         #oData = OperationDB('SEL', 'USER_BOT_ROLE', ["'Y' VALIDATE"], None, "IDMEMBER = '"+ str(cMemberId) +"' AND BOT_COMMAND = '"+ cCommand +"' AND IDGAME = "+ str(nIdGame) +" AND APLICATIONID = '"+ str(cAplicationId) +"'", None)
 
-        oData = OperationDB('SEL', 'USER_BOT_ROLE', ["'Y' VALIDATE"], None, "IDMEMBER = '"+ str(cMemberId) +"' AND BOT_COMMAND = '"+ cCommand +"' AND APLICATIONID = '"+ str(cAplicationId) +"'", None)
+        oData = OperationDB('SEL', 'USER_BOT_ROLE', ["'Y' VALIDATE"], None, "IDMEMBER = '"+ str(cMemberId) +"' AND BOT_COMMAND = '"+ cCommand +"' AND APLICATIONID = '"+ str(cAplicationId) +"' AND STATUS = 'OK'", None)
         
         dblista = []
 
@@ -395,7 +377,7 @@ class OperDiscord(commands.Cog):
 
         cAplicationId = bot.application_id
 
-        oData = OperationDB('SEL', "HELPER_ROLE HR", ['ROLENAME','DESCRIPTION','HELPERCODE'], None, "NOT EXISTS(SELECT 'S' from USER_BOT_ROLE UB Where UB.IDGAME = "+ str(nIdGame) +" AND UB.STATUS = 'OK' AND UB.ROLEID = HR.ROLEID AND UB.APLICATIONID = '"+ str(cAplicationId) +"')", None)
+        oData = OperationDB('SEL', "HELPER_ROLE HR", ['ROLENAME','DESCRIPTION','HELPERCODE'], None, "NOT EXISTS(SELECT 'S' from USER_BOT_ROLE UB Where UB.IDGAME = "+ str(nIdGame) +" AND UB.STATUS = 'OK' AND UB.ROLEID = HR.ROLEID AND UB.APLICATIONID = '"+ str(cAplicationId) +"') AND POST = 'S'", None)
         
         dblista = []
 
@@ -883,7 +865,7 @@ async def helpgame(ctx, cCommand: str):
     if cCommand == 'stopgame' or cCommand == '*':
         await foo.PostGeneralInfo(ctx, 'Command: !stopgame', 'Parameters: None',["Example: !stopgame","Stop the Three Questions' Game"])
     if cCommand == 'savescore' or cCommand == '*':
-        await foo.PostGeneralInfo(ctx, 'Command: !savescore', 'Parameters: Point_code @User Score',["Example: !savescore P @user score", "Registry the score of a player and depends of the parameter Point Code",'Reference: * Point_code -> (ej. P = Presentation / Q = Follow-Question)','@User -> User member inside the voice room','Score -> Score won'])
+        await foo.PostGeneralInfo(ctx, 'Command: !savescore', 'Parameters: Point_code @User Score',["Example: !savescore P @user score", "Registry the score of a player which depends of the parameter Point Code",'Reference: * Point_code -> (ej. P = Presentation / Q = Follow-Question)','@User -> User member inside the voice room','Score -> Score won'])
         #savescore(ctx, cPointCode: str, cMemberId: str, nPoint: int):
     if cCommand == 'gamestatus' or cCommand == '*':
         await foo.PostGeneralInfo(ctx, 'Command: !gamestatus', 'Parameters: None',["Example: !gamestatus","Show the status of the current game: Active / Inactive"])

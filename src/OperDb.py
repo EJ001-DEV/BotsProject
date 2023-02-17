@@ -25,7 +25,8 @@ class DiscordDB():
         #self.timer = Timer()
         #self.db = sqlite3.connect(format(env['DBName']))
         #self.create_tables()
-        print('init')
+        #print('init')
+        pass
 
 
     def create_tables(self):
