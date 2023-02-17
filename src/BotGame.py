@@ -547,6 +547,23 @@ class OperDiscord(commands.Cog):
         #oConection.close()
         await ctx.send(embed=embed)
 
+    async def CopyPaster(Self, ctx, cProcedure):
+        if cProcedure.upper() == 'Q':
+            await foo.PostGeneralInfo(ctx, 'QUESTIONS:', " **Pick a Question** por favor. Speak for 30 seconds to a minute. **Include details and descriptions**! Loud and Clear. Smooth and Confident, you can do this!",[":smile:          :laughing:          :blush:          :rofl:          :heart_eyes:          :partying_face:",":one: What was the first cool sport you played as a child? What did you like about it?",":two: What type of animal videos do you prefer: Lions Hunting, Cute Puppies or Whales & Dolphins?",":three: Is caffeine bad for you? Are you addicted or do you stay away from it?",":smile:          :laughing:          :blush:          :rofl:          :heart_eyes:          :partying_face:"]) 
+        if cProcedure.upper() == 'G':
+
+            #############################################################################
+            #await foo.PostGeneralInfo(ctx, '', "",[":dog2:          :hippopotamus:          :kangaroo:          :rabbit2:          :giraffe:          :elephant:"])        
+
+            await foo.PostGeneralInfo(ctx, ':poultry_leg:          :pizza:          :ice_cream: How to play: :ice_cream:         :pizza:         :poultry_leg:', "",["Listen to Players giving Presentations and send a nice Follow-Up Question to the Text Chat.","You will then be asked to repost it to the Text Chat and ask it On Mic. Pick one of the Three Questions before it's your turn. Write some notes down to organize your ideas.","Lots of  Details and Descriptions, please!","As you listen, please type out some nice compliments and cool vocabulary to help the Speakers feel good about themselves and improve their language skills! Gracias a todo por participar!",":carrot:            :peach:            :grapes:            :salad:            :hot_pepper:            :avocado:            :blueberries:"])        
+
+            #await foo.PostGeneralInfo(ctx, '', "",[":carrot:            :peach:            :grapes:            :salad:            :hot_pepper:            :avocado:            :blueberries:"])
+            #############################################################################
+
+            #await foo.PostGeneralInfo(ctx, '', "",[":dog2:          :hippopotamus:          :kangaroo:          :rabbit2:          :giraffe:          :elephant:"])        
+
+            await foo.PostGeneralInfo(ctx, 'BONUSES:', "To encourage timeliness, we have **NEW BONUSES**!",[":dog2:          :hippopotamus:          :kangaroo:          :rabbit2:          :giraffe:          :elephant:","⦁	+3 for Presentations that finish between 30 to 75 seconds","⦁	+1 For each Follow-Up Response between 15 - 40 seconds","**This will reward people who can keep it short and sweet! (but not too short)**",":dog2:          :hippopotamus:          :kangaroo:          :rabbit2:          :giraffe:          :elephant:"])             
+
     @commands.Cog.listener()
     async def strtgame(Self, ctx):
         """
@@ -580,10 +597,32 @@ class OperDiscord(commands.Cog):
             #Insert a row of a game of a Channel Room
             OperationDB('INS', 'GAME', ['IDCHANNEL','DATESTARTGAME','DESCRIPTION','STATUS'], ["'"+ cIdChannel + "'", "'"+ current_time + "'", "'TQD game'", "'OK'"], '', None)
         else:#show a meesage in Discord
-            await ctx.send('Game have been started, to stop the game type: !stopgame')
+            await ctx.send('Game has been started, to stop the game type: !stopgame')
         oData.close()
         
         await foo.PostGeneralInfo(ctx, 'GAME STARTED', "The Three Questions' Game",["⦁	challenges us to do fun and interesting verbal Presentations in Spanish or English! After each Presentation we do a Follow-Up Question Round when everybody gets to ask a nice follow-up question related to the Presentation.", "⦁	We 'conquer our nerves' by practicing a smooth, confident and professional style of delivery.","⦁	We try to keep the microphone clear for the Player and Co-Host. However, we are all free to discuss things in the Text Chat. We also like to type out nice compliments and cool vocabulary to help people feel good about themselves and improve!","⦁	You'll be asking Follow-Up Questions and eventually, you will be asked to do a brief Presentation. Take some notes before your Presentation if you can. Gracias!"])
+        #############################################################################
+        #await foo.PostGeneralInfo(ctx, '', "",[":dog2:          :hippopotamus:          :kangaroo:          :rabbit2:          :giraffe:          :elephant:"])        
+
+        await foo.PostGeneralInfo(ctx, 'Introduction', "",[":dog2:          :hippopotamus:          :kangaroo:          :rabbit2:          :giraffe:          :elephant:","Please briefly say hello. Mention your native language and how long you have been speaking English (or Spanish).",":dog2:          :hippopotamus:          :kangaroo:          :rabbit2:          :giraffe:          :elephant:"])        
+
+        #await foo.PostGeneralInfo(ctx, '', "",[":dog2:          :hippopotamus:          :kangaroo:          :rabbit2:          :giraffe:          :elephant:"])   
+        #############################################################################
+
+        #############################################################################
+        #await foo.PostGeneralInfo(ctx, '', "",[":dog2:          :hippopotamus:          :kangaroo:          :rabbit2:          :giraffe:          :elephant:"])        
+
+        await foo.PostGeneralInfo(ctx, ':poultry_leg:          :pizza:          :ice_cream: How to play: :ice_cream:         :pizza:         :poultry_leg:', "",["Listen to Players giving Presentations and send a nice Follow-Up Question to the Text Chat.","You will then be asked to repost it to the Text Chat and ask it On Mic. Pick one of the Three Questions before it's your turn. Write some notes down to organize your ideas.","Lots of  Details and Descriptions, please!","As you listen, please type out some nice compliments and cool vocabulary to help the Speakers feel good about themselves and improve their language skills! Gracias a todo por participar!",":carrot:            :peach:            :grapes:            :salad:            :hot_pepper:            :avocado:            :blueberries:"])        
+
+        #await foo.PostGeneralInfo(ctx, '', "",[":carrot:            :peach:            :grapes:            :salad:            :hot_pepper:            :avocado:            :blueberries:"])
+        #############################################################################
+
+        #await foo.PostGeneralInfo(ctx, '', "",[":dog2:          :hippopotamus:          :kangaroo:          :rabbit2:          :giraffe:          :elephant:"])        
+
+        await foo.PostGeneralInfo(ctx, 'BONUSES:', "To encourage timeliness, we have **NEW BONUSES**!",[":dog2:          :hippopotamus:          :kangaroo:          :rabbit2:          :giraffe:          :elephant:","⦁	+3 for Presentations that finish between 30 to 75 seconds","⦁	+1 For each Follow-Up Response between 15 - 40 seconds","**This will reward people who can keep it short and sweet! (but not too short)**",":dog2:          :hippopotamus:          :kangaroo:          :rabbit2:          :giraffe:          :elephant:"])        
+
+        #await foo.PostGeneralInfo(ctx, '', "",[":dog2:          :hippopotamus:          :kangaroo:          :rabbit2:          :giraffe:          :elephant:"])   
+        #############################################################################
 
         await Self.allmembers(ctx)#list all members of Channel Room
     
@@ -882,9 +921,10 @@ async def helpgame(ctx, cCommand: str):
     if cCommand == 'giverole' or cCommand == '*':
         await foo.PostGeneralInfo(ctx, 'Command: !giverole', 'Parameters: @User RoleJob',["Example: !giverole @user TK","Give permissions by roles to a user and can use commands related a role",'Reference: * @User -> User member inside the voice room','RoleJob -> (ej. CH = CO-HOSTER / TK = TIMEKEEPER / SK = SCOREKEEPER / CP = COPY-PASTER / DP = DICTIONARY-PERSON)'])
     if cCommand == 'removerole' or cCommand == '*':
-        await foo.PostGeneralInfo(ctx, 'Command: !removerole', 'Parameters: RoleJob',["Example: !removerole SK","Remove permissions Assigned to a user",'Reference: * RoleJob -> Assigned role'])        
-
-
+        await foo.PostGeneralInfo(ctx, 'Command: !removerole', 'Parameters: RoleJob',["Example: !removerole SK","Remove permissions Assigned to a user",'Reference: * RoleJob -> Assigned role'])   
+    if cCommand == 'postcopy' or cCommand == '*':
+        await foo.PostGeneralInfo(ctx, 'Command: !postcopy', 'Parameters: Procedure',["Example: !postcopy Q","Post information about game, it can be execute any time by Copy-Paster's helper",'Reference: cProcedure -> Q = information of three questions / G = general informations when started game'])   
+         
 @bot.command()
 async def startgame(ctx):
     """
@@ -894,7 +934,8 @@ async def startgame(ctx):
 
     Description: Start the Three Questions' Game
     """
-    cOwner = ['780821223063027755','705234368758808660']
+    cOwner = ['780821223063027755',
+    '705234368758808660']
     cAuthor = ctx.author.id
     if not str(cAuthor) in cOwner:
 
@@ -1387,5 +1428,9 @@ async def clonerole(ctx, cIdMember: str, cCommand: str):
         await foo.PostGeneralInfo(ctx, 'WARNING', "Doesn't exists a game started",["You need start a new game with: !startgame"])
         return
 
+@bot.command()#post info from copy-paste information
+async def postcopy(ctx, cProcedure: str):
+    await foo.CopyPaster(ctx, cProcedure)
 
-bot.run(format(env['BOT_TOKEN']))#Start the Bot
+
+bot.run(format(env['BOT_TEST']))#Start the Bot
