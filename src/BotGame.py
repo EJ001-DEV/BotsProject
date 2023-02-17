@@ -895,8 +895,8 @@ async def startgame(ctx):
     Description: Start the Three Questions' Game
     """
     cOwner = ['780821223063027755','705234368758808660']
-
-    if not (ctx.author.id in cOwner):
+    cAuthor = ctx.author.id
+    if not str(cAuthor) in cOwner:
 
         ###########################################
         #Validate roles permissions
@@ -909,14 +909,14 @@ async def startgame(ctx):
         oConection.close() 
 
         cFunctionName =  startgame.name#Function name to be using look up role and permissions
-
-        bValidate = foo.ValidateRoleByCommand(ctx.author.id, cFunctionName, nIdGame, bot.application_id)
+        cAplication = bot.application_id
+        bValidate = foo.ValidateRoleByCommand(ctx.author.id, cFunctionName, nIdGame, cAplication)
 
         if bValidate == False:#Validate if the role was used
             await ctx.send("THE USER ( "+ str(ctx.author) +" ) **DOESN'T HAVE PERMISSION** TO USING: **"+ str(cFunctionName)+"**")
             return  
         ###########################################     
-
+    '''
     bStatus = False
 
     bStatus = foo.Get_GameStatus()
@@ -925,6 +925,18 @@ async def startgame(ctx):
         await foo.PostGeneralInfo(ctx, 'WARNING', 'Exists a game started',["To start a new game, first you need close the current game with: !stopgame"])
         return
 
+    oSelect = []
+    oSelect = foo.Get_Game_OK()#find a active game
+    oConection = oSelect[0]
+    nIdGame = oSelect[1]
+    oConection.close()   
+    #print('Author: ' + cAuthor)
+    bValidate = foo.Validate_User(str(cAuthor), str(nIdGame))
+
+    if bValidate == False:
+        await ctx.send("User is not in the voice channel or game, check out!")
+        return        
+    '''
     await foo.strtgame(ctx)
 
     #Give Owner's permission to the designated users like Owners    
@@ -952,6 +964,8 @@ async def stopgame(ctx):
     cFunctionName =  stopgame.name#Function name to be using look up role and permissions
 
     bValidate = foo.ValidateRoleByCommand(ctx.author.id, cFunctionName, nIdGame, bot.application_id)
+
+    bot.application_id
 
     if bValidate == False:#Validate if the role was used
         await ctx.send("THE USER ( "+ str(ctx.author) +" ) **DOESN'T HAVE PERMISSION** TO USING: **"+ str(cFunctionName)+"**")
@@ -1133,10 +1147,8 @@ async def start(ctx, cProcedure: str, cUser: str):#start timer
 
     bValidate = foo.Validate_User(cMemberGlobal, nIdGame)
 
-    if bValidate:
-        pass
-    else:
-        await ctx.send("User is not in the game, check out!")
+    if bValidate == False:
+        await ctx.send("User is not in the voice channel or game, check out!")
         return
 
     await starttimer(ctx, cProcedure, cUser)
