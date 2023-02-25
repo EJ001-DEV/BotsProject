@@ -776,6 +776,7 @@ async def on_voice_state_update(member:discord.Member, before, after):
     cMemberId = member.id
 
     if member == bot.user:  #CATCH
+        print('Catch event')
         return
     
     if str(after.channel) == 'Lounge':

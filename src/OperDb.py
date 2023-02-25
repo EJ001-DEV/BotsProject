@@ -75,7 +75,7 @@ class DiscordDB():
         
         
         
-        print(cSQL)
+        #print(cSQL)
         #oData = []
         self.db = sqlite3.connect(format(env['DBName']))
         cur = self.db.cursor()        
@@ -86,7 +86,7 @@ class DiscordDB():
         #for row in cur.execute(cSQL):
         #    #print(row[0] , row[1], row[2])        
         #    print(row)
-        
+        print('Select Done!')
         return row
 
     def ProcInsert(self, cTable : str, field, ValueInsert):
@@ -101,7 +101,7 @@ class DiscordDB():
         cur.execute(cSQL)        
         self.db.commit()
         self.db.close()
-        print('Insert Done')
+        print('Insert Done!')
 
     def ProcUpdate(self, cTable : str, cField_cValue, cWhere : str):
         #Split fields of select
@@ -115,7 +115,7 @@ class DiscordDB():
         cur.execute(cSQL)        
         self.db.commit()
         self.db.close()
-        print('Update Done')        
+        print('Update Done!')        
         
 def OperationDB(cOper : str, cTable : str, oField, oValue, cWhere : str, cOptionalSQL: str):
     #construct the object

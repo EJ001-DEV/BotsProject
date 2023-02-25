@@ -127,8 +127,10 @@ async def RuleTime(ctx, cProcedure : str, sUser : str):
         await ctx.send('INFO: Limit time of the Follows-Questions: ' + timer + ' for ' + sUser)
 
 @bot.command(pass_context=True)
-async def LastMessage(ctx, LastTime : int):    
+async def LastMessage(ctx, LastTime : int):  
+    await ctx.send(':stopwatch:          :stopwatch:          :stopwatch:          :stopwatch:')
     await ctx.send('**TIME: ' + str(Seconds_to_TimeFormat(LastTime)) + '**')
+    await ctx.send(':stopwatch:          :stopwatch:          :stopwatch:          :stopwatch:')
 
 @bot.command(pass_context=True)
 async def RuleLoop(ctx, nTime : int, sProcedure : str):
