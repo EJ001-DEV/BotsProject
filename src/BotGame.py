@@ -431,6 +431,8 @@ class OperDiscord(commands.Cog):
         #    await ctx.send("User is not in the game, check out!")
         #    return
 
+        print('Before upedate')
+
         #kick out all member from the game by the status: OK -> OUT
         OperationDB('UPD', 'USER_BOT_ROLE', "STATUS = 'OUT'", None, "IDGAME = "+ str(nIdGame) +" AND ROLEID IN(SELECT HR.ROLEID FROM HELPER_ROLE HR WHERE HR.HELPERCODE = '"+ cRoleCode +"')", None)      
 
@@ -1431,6 +1433,24 @@ async def clonerole(ctx, cIdMember: str, cCommand: str):
 
 @bot.command()#post info from copy-paste information
 async def postcopy(ctx, cProcedure: str):
+    ###########################################
+    #Validate roles permissions
+    ###########################################
+    oConection = None
+    oSelect = []
+    oSelect = foo.Get_Game_OK()#find a active game
+    oConection = oSelect[0]
+    nIdGame = oSelect[1]
+    oConection.close() 
+
+    cFunctionName =  postcopy.name#Function name to be using look up role and permissions
+
+    bValidate = foo.ValidateRoleByCommand(ctx.author.id, cFunctionName, nIdGame, bot.application_id)
+
+    if bValidate == False:#Validate if the role was used
+        await ctx.send("THE USER ( "+ str(ctx.author) +" ) **DOESN'T HAVE PERMISSION** TO USING: **"+ str(cFunctionName)+"**")
+        return  
+    ###########################################    
     await foo.CopyPaster(ctx, cProcedure)
 
 
